@@ -6,20 +6,20 @@
 #+BEGIN_SRC text
   01:00.0 VGA compatible controller [0300]:NVIDIA Corporation GP106 [GeForce GTX 1060 6GB] [10de:1c03] (rev a1) (prog-if 00 [VGA controller])
 #+END_SRC
-1. Fully update your system 
+***  Fully update your system 
 #+BEGIN_SRC shell
   dnf update
 #+END_SRC
-2. Enable RPM fusion
+*** Enable RPM fusion
 #+BEGIN_SRC shell
   dnf install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm 
   dnf install https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
 #+END_SRC
-3. Lastly install a relevant Nvidia driver package by selecting one of the following options: 
+*** Lastly install a relevant Nvidia driver package by selecting one of the following options: 
 #+BEGIN_SRC shell
   dnf install akmod-nvidia
 #+END_SRC
-4.  All done. Reboot your system: 
+***  All done. Reboot your system: 
 #+BEGIN_SRC shell
   reboot
 #+END_SRC
