@@ -1,0 +1,75 @@
+* write your systemd file (UNIT FILE)
+** write my.service to /usr/lib/systemd/system/${your_locaton}
+[Unit]
+Description=My Script
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/myscript
+
+[Install]
+WantedBy=multi-user.target
+
+** red hat reference
+[[https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/system_administrators_guide/sect-managing_services_with_systemd-unit_files][how to write unit file]]
+* Reload the systemd service files:
+  systemctl daemon-reload
+* Check that it is working with 
+  systemctl start my
+* emacs daemon example emacs.service
+#+BEGIN_SRC 
+touch /etc/systemd/system/emacs.service
+chmod 664 /etc/systemd/system/emacs.service
+#+END_SRC
+write emacs.service
+#+BEGIN_SRC 
+[Unit]
+Description=Emacs: the extensible, self-documenting text editor
+           
+[Service]
+Type=forking
+ExecStart=/usr/bin/emacs --daemon
+ExecStop=/usr/bin/emacsclient --eval "(kill-emacs)"
+Environment=SSH_AUTH_SOCK=%t/keyring/ssh
+Restart=always
+           
+[Install]
+WantedBy=default.target
+#+END_SRC
+* execStartPre and exit(0) is 0 and work will
+#+BEGIN_SRC 
+[Unit]
+Description=docker compose for redis
+Requires=docker.service
+After=docker.service
+
+[Service]
+Restart=always
+
+WorkingDirectory=/root/mango-games/slot/redis/redis-sentinel-docker
+
+# Remove old containers, images and volumes
+ExecStartPre=/usr/bin/docker-compose down -v
+#ExecStartPre=/usr/bin/docker-compose rm -fv
+#ExecStartPre=-/bin/bash -c 'docker volume ls -qf "name=%i_" | xargs docker volume rm'
+ExecStartPre=-/bin/bash -c 'docker ps -aqf "name=sentinel*" | xargs docker rm'
+ExecStartPre=-/usr/bin/docker-compose -p sentinel build'
+
+# Compose up
+ExecStart=/usr/bin/docker-compose -p sentinel up
+
+# Compose down, remove containers and volumes
+ExecStop=/usr/bin/docker-compose down -v
+
+[Install]
+WantedBy=multi-user.target
+
+#+END_SRC
+** execStartPre(執行想要的程式前, 要執行的內容)
+ 1. 開頭是 - 當它執行失敗, 也會繼續run 下去
+** Requires
+ 需要某個service
+** WantedBy: 
+ 等到某個程式啟動, 才會執行
+** ExecStop
+ stop server 時, 怎麼執行stop

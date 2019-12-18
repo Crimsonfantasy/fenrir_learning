@@ -1,0 +1,13 @@
+* /etc/fstab + sshfs, linux mount remote folder Permanently
+ 1. port 不是22, 在/.ssh/config 加host name
+
+ 2. add this line  in /etc/fstab 
+#+BEGIN_SRC 
+sshfs#slot_video_cloud:/var/videos /home/jenkins/mango-games/slot/videos fuse idmap=user,uid=1000,gid=1000,umask=0,allow_other,_netdev,IdentityFile=/root/.ssh/id_rsa,allow_other,reconnect,defaults 0 0 
+#+END_SRC
+ 3. reload /etc/fstab
+#+BEGIN_SRC 
+sudo mount -a
+#+END_SRC
+
+

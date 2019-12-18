@@ -1,0 +1,20 @@
+* sudo user, and password
+** sudo without password
+*** step by step
+ 1. sudo vi /etc/sudoers
+    1). jenkins  ALL=(ALL)      NOPASSWD: ALL
+    增加NOPASSWD: ALL, sudo 可以不用打密碼
+*** 假如設定檔寫壞了.. 
+#+BEGIN_SRC 
+  pkexec visudo
+#+END_SRC
+     
+* jenkins 啟動stsyemd, 判定為command fail怎麼處理?
+  標頭檔要有, 就不會有這種問題
+#+BEGIN_SRC 
+ #!/usr/bin/env bash
+#+END_SRC
+
+* jenkins 限制
+** deployee 的shell結尾必須有BUILD_ID=${command line}
+** timeout command 不能過用超過30 秒

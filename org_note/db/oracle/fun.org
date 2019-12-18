@@ -1,0 +1,5 @@
+* spilt character
+#+BEGIN_SRC 
+select REGEXP_SUBSTR('xxx@oooo@cccc', '[^@]+', 1, 2) from SLOT_PLAY_SESSION;
+#+END_SRC
+show oooo

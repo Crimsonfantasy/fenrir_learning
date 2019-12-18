@@ -1,0 +1,41 @@
+* linux watch user open file
+ - cat /proc/sys/fs/file-max (max opened file)
+   3268085
+ - cat /proc/sys/fs/file-nr 
+   (4512 is cureent open file, 3269085 is max number of opened file)
+   4512	0	3268085
+* nproc是操作系统级别对每个用户创建的进程数的限制
+ - ps h -Led -o user | sort | uniq -c | sort -n
+   (查看用戶開了多少個process)
+ - ps -o nlwp,pid,lwp,args -u ${USER} | sort -n 
+   (查看使用者hdfs開了多少個process)
+ - vi /etc/security/limits.conf  (更改linux nporc)
+* 監控io使 %nice %system %iowait  %steal   %idle
+           4.66    0.00    2.15    0.00    0.00   93.19
+
+Device:         rrqm/s   wrqm/s     r/s     w/s    rMB/s    wMB/s avgrq-sz avgqu-sz   await r_await w_await  svctm  %util(使用率%)
+sda               0.00     0.00    0.00    0.20     0.00     0.04   448.00     0.00    0.00    0.00    0.00   0.00   0.00
+sdb               0.00     0.00    0.00    0.00     0.00     0.00     0.00     0.00    0.00    0.00    0.00   0.00   0.00
+
+#+END_SRC
+* 收集系統數據
+可以收集cpu使用率, 系統cpu, system calll,記憶體分頁, 磁碟io
+  #+BEGIN_SRC 
+    sar 
+  #+END_SRC
+
+* cpu 效能
+收集各應用程式cpu效能的計數器
+cpustat
+cputrack => 比較cpustat比較沒有侵入性
+** How do I measure ssseparate CPU core usage for a process?
+1. top
+ #+BEGIN_SRC 
+   top and press '1'
+#+END_SRC
+2. mpstat
+ #+BEGIN_SRC 
+ mpstat -P ALL 1
+ #+END_SRC
+** Limit to that user
+top and press 'u'

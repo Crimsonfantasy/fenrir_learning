@@ -1,0 +1,51 @@
+* drop all table,seq for a user
+select 'drop table '||table_name||' cascade constraints;' from user_tables;
+select 'drop '||object_type||' '|| object_name || ';' from user_objects where object_type in ('VIEW','PACKAGE','SEQUENCE', 'PROCEDURE', 'FUNCTION', 'INDEX');
+* grant create table
+grant create any table to JBGAME;
+* revoke dba
+1. REVOKE   dba from JBGAME;
+
+* all column of table
+select * from ALL_TAB_COLUMNS where table_name= 'ACCOUNTS';
+* query
+** limit row number
+*** before  oracle 12g 
+#+BEGIN_SRC 
+select PARENT, PARENTS from JBWEB.ACCOUNTS where rownum = 1;
+#+END_SRC
+*** oracle 12 g
+#+BEGIN_SRC 
+select a.*   from emp a  order by a.name  fetch first n rows only;  
+SELECT val FROM   rownum_order_test ORDER BY val FETCH FIRST 20 PERCENT ROWS ONLY;
+#+END_SRC
+** exist
+#+BEGIN_SRC 
+select 1
+from DUAL
+where exists(
+              select GAMESEQ from BA_GAME_RESULT_SERVER where GAMESEQ = 27898055);
+#+END_SRC
+* store proceure
+** array
+ #+BEGIN_SRC 
+ declare
+  type array_t is varray (9) of varchar2(200);
+  array array_t := array_t('GA',
+                           'GAC',
+                           'GAI',
+                           'AA',
+                           'AAM',
+                           'AAC',
+                           'AVU',
+                           'AVV',
+                           'MRG');
+begin
+  for i in 1..array.count
+    loop
+      INSERT INTO JBWEB.GAME_DOMAIN_SETTING (DS_ID, DOMAIN, GAME_TYPE, SETTING_KEY, TABLE_ID)
+      VALUES (INSERT_SEQ.nextval, array(i), 'roulette', 'playableTable', 901);
+    end loop;
+  commit;
+end;
+ #+END_SRC

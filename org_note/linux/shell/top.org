@@ -1,0 +1,23 @@
+* load average
+ HomeLinuxLoad Average 負載解讀
+Load Average 負載解讀 Sam Tang  14 April 2016  Linux  No Comments
+
+Linux 及其他 Unix-Like 作業系統都有一組稱為 Load Average 的數值，從這組數值可以判斷系統有多繁忙，數值越大表示系統越繁忙；數值越小表示系統越閒置，很多系統管理員也會根據這組數值衡量系統的負載。
+
+要查看 Load Average 有不同的方法，最簡單是執行 update 指令：
+
+$ uptime
+08:29:12 up 20 days, 22:28, 1 user, load averages: 0.29, 0.20, 0.29
+Linux 的 Load Average 的數字代表有多少個 process 在等待 CPU 及 DISK I／O 等資源運算，如果是 1 表示有一個 process 正在執行或等待 CPU 運算；5 表示有 5 個 process 正在執行或等待 CPU 運算，一台完全閒置的電腦，其 Load Average 是 0.
+這個 Load Average 數值可以簡單地這樣看待，對於一台只有一個核心的單處理器系統，Load Average 為 1.03 時表示系統超載 3%，如果是 0.8，表示系統並未超載，只用了 80%.
+
+那究竟 Load Average 在甚麼水平才算高呢？以前在一個外國論壇看到這個講法，我也一直沿用：
+
+Load Average 長期超過 0.7: 原則上系統沒有甚麼問題，但這個時候也應該檢查一下，看看究竟是硬件需要升級，還是有其他甚麼原因。
+Load Average 長期超過 1.0: 這時系統執行上還十分暢順，但應該盡快檢查系統的問題。
+Load Average 長期超過 5.0: 要立即檢查問題，不然半夜三更當機，那便會十分麻煩。
+
+當然如果系統只是短暫時間到達以上數值，這個問題不太，只要不是長時間便好。
+但對於一台有多夥 CPU 的系統，計算方法便有所不同了，而且現在的 CPU 都已經是多核心，所以不可以單看 Load Average 的數值。例如系統內 CPU 是四核心，那麼 Load Average 到達 4 才是 100% 負載。以上面的算法，以一台有單夥四核心處理器的伺服器，我會在 Load Average 長期超過 3 時檢查那裡出現問題。
+用 uptime 查看 Load Average 時，會有三個數值，它們從左至右分別代表 Load Average 時段是：最近 1 分鐘, 最近 5 分鐘, 及最近 15 分鐘。原則上第一個數值的意義不大，因為那只是最近 1 分鐘的 Load Average，要監測系統的負載，第 2 (過去 5 分鐘) 及第 3 個 (過去 15 分鐘) 數值的意思更大。
+除了 Linux 外，其他 Unix Like 環境，例如 Mac 也可以執行 uptime 查看系統的 Load Average，或者如果像 Router (DD-WRT 可以看到) 這類裝置，如果有提供這個功能的話，也可以查看它的 Load Average。

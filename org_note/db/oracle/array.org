@@ -1,0 +1,22 @@
+* array for each example
+#+BEGIN_SRC 
+declare
+  type array_t is varray (9) of varchar2(200);
+  array array_t := array_t('GA',
+                           'GAC',
+                           'GAI',
+                           'AA',
+                           'AAM',
+                           'AAC',
+                           'AVU',
+                           'AVV',
+                           'MRG');
+begin
+  for i in 1..array.count
+    loop
+      INSERT INTO JBWEB.GAME_DOMAIN_SETTING (DS_ID, DOMAIN, GAME_TYPE, SETTING_KEY, TABLE_ID)
+      VALUES (INSERT_SEQ.nextval, array(i), 'roulette', 'playableTable', 901);
+    end loop;
+  commit;
+end;
+#+END_SRC

@@ -1,0 +1,78 @@
+* 參數敘述
+** '-analyzeduration', '0',
+**  '-i', `${this.streamSource} live=1`,
+** '-f', 'mpegts',
+** '-codec:v', 'mpeg1video',
+** '-codec:a', 'mp2',
+** '-s', `${width}x${height}`,
+** '-b:v', '500k' : 輸出影片的檔案大小
+**  '-bf', '0',
+** '-an',
+** '-ar', '44100',
+** '-ac', '1',
+** '-b:a', '32k',
+**  '-r', '24',
+** '-muxdelay', '0.001',
+** `http://127.0.0.1:${streamPort}/${secret}/${width}/${height}/`;
+* snapshot
+** -vframes option
+Output a single frame from the video into an image file:
+#+BEGIN_SRC 
+ffmpeg -i input.flv -ss 00:00:14.435 -vframes 1 out.png
+#+END_SRC
+This example will seek to the position of 0h:0m:14sec:435msec and output one frame (-vframes 1) from that position into a PNG file.
+** fps video filter
+Output one image every second, named out1.png, out2.png, out3.png, etc.
+#+BEGIN_SRC 
+ffmpeg -i input.flv -vf fps=1 out%d.png
+#+END_SRC
+Output one image every minute, named img001.jpg, img002.jpg, img003.jpg, etc. The %03d dictates that the ordinal number of each output image will be formatted using 3 digits.
+#+BEGIN_SRC 
+ffmpeg -i myvideo.avi -vf fps=1/60 img%03d.jpg
+#+END_SRC
+Output one image every ten minutes:
+#+BEGIN_SRC 
+ffmpeg -i test.flv -vf fps=1/600 thumb%04d.bmp
+#+END_SRC
+** select video filter
+Output one image for every I-frame:
+#+BEGIN_SRC 
+ffmpeg -i input.flv -vf "select='eq(pict_type,PICT_TYPE_I)'" -vsync vfr thumb%04d.png
+#+END_SRC
+
+
+* 紀錄影判, 片段影片儲存
+  #+BEGIN_SRC 
+ffmpeg -i  rtmp://m29edg.mtsrv33.com/mk/venus_rl -s 720x480 -f segment  -strftime 1 -segment_time 10  -segment_format  flv out%Y-%m-%d_%H-%M-%S.flv
+  #+END_SRC
+folder
+#+BEGIN_SRC 
+strftime_mkdir
+#+END_SRC
+ffmpeg -i  rtmp://m29edg.mtsrv33.com/mk/venus_rl -s 720x480 -f segment -strftime_mkdir 1 -strftime 1 -segment_time 10  -segment_format  flv %Y%m%d/%H.%M.%S.flv
+** error handle
+*** Non-monotonous DTS in output stream 0:0; previous: 0, current: 0; changing to 1. This may result in incorrect timestamps in the output file.
+#+BEGIN_SRC 
+ffmpeg   -i  rtmp://m29edg.mtsrv33.com/mk/venus_rl -s 720x480 -c:a copy -map 0  -f segment  -strftime 1 -segment_time 10  -segment_format flv out%Y-%m-%d_%H-%M-%S.flv 
+#+END_SRC
+    rtmp 聲音和影像分為二個tunnel傳送, 通常先收到聲音, 如果沒有收到影像, 就不會decode, 等到收到影像才會decode,
+#+BEGIN_SRC 
+ _______              ______________            ________
+|       |            |              |          |        |
+| input |  demuxer   | encoded data |  muxer   | output |
+| file  | ---------> | packets      | -------> | file   |
+|_______|            |______________|          |________|
+
+#+END_SRC
+copy 能省略, decode input 和encode ouput,  It makes ffmpeg omit the decoding and encoding step for the specified stream
+#+BEGIN_SRC 
+ffmpeg   -i  rtmp://m29edg.mtsrv33.com/mk/venus_rl -s 720x480 -c:a copy -map 0  -f segment  -strftime 1 -segment_time 10  -segment_format flv out%Y-%m-%d_%H-%M-%S.flv 
+./ffmpeg   -i  rtmp://10.10.0.31/mekong/mkdealer6 -s 720x480 -c:a copy -map 0  -f segment  -strftime 1 -segment_time 10  -segment_format flv out%Y-%m-%d_%H-%M-%S.flv 
+
+#+END_SRC
+
+
+* libX264 編碼
+  -vcodec libx264 -c:a aac
+* check connection
+rtmpdump -v   -r  rtmp://10.10.0.31/mekong/mkdealer1  -app mekong --playpath  mkdealer1 --live -flv --stop 30 -o test.flv 

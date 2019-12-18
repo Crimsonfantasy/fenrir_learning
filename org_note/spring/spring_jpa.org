@@ -1,0 +1,32 @@
+* specify  Query in transaction that  Spring manages
+http://hantsy.blogspot.tw/2013/11/auditing-with-hibernate-envers.html
+- Declaration 
+#+BEGIN_SRC 
+@PersistenceContext
+EntityManager em;
+#+END_SRC
+
+- add transaction callback
+1. 
+#+BEGIN_SRC 
+TranscationTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+        // TransactionCallbackWithoutResult
+        transactionTemplate.execute(new TransactionCallback<EmmDeviceCfg>() {
+            @Override
+            public EmmDeviceCfg doInTransaction(TransactionStatus arg0) {
+            }
+        });
+#+END_SRC
+2.
+#+BEGIN_SRC 
+ transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+            
+     @Override
+  protected void doInTransactionWithoutResult(TransactionStatus status) {}
+});
+#+END_SRC
+* connection pool
+- spring 喜歡 HikariCP [[[https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-sql.html][reference]]]
+ We prefer HikariCP for its performance and concurrency.
+ If HikariCP is available, we always choose it.
+

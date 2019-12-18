@@ -1,0 +1,15 @@
+* grep 
+** file name that naed with number occuring 6 times
+#+BEGIN_SRC 
+ls | grep  -E "[[:digit:]]{6}"
+#+END_SRC
+10228
+110229
+110230
+120110
+120111
+120112
+120113
+120114
+120115
+120116

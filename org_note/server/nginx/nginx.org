@@ -1,0 +1,74 @@
+* http
+** 讓X-Forwarded-For 只有一個原始IP
+#+BEGIN_SRC 
+ map $proxy_add_x_forwarded_for $client_ip {"~(?<IP>([0-9]{1,3}\.){3}[0-9]{1,3}),.*" $IP;}
+ proxy_set_header X-Forwarded-For $client_ip;
+#+END_SRC
+
+
+* problem
+** permission denied (open file or write)
+*** change nginx user
+ 1. vi /etc/nginx/nginx.conf
+ 2. user $yourUserName
+*** change file permission
+ 1. chmod 775 $fileName
+ 2. 確定folder parants是不是755
+*** centos SELinux 在搞鬼
+**** 查看狀態SELinux
+ /usr/sbin/sestatus -v
+**** 關閉方法:
+ 1. setenforce 0 
+    臨時關閉, 不需重新開機
+ 2. vi /etc/selinux/config
+ #+BEGIN_SRC 
+  #SELINUX=enforcing
+ SELINUX=disabled
+ #+END_SRC
+ 
+**** 不關閉seleux的方法
+1. 檢查從/到web root的dir有沒有755的權限
+2. 將web root dir要求selux restore一次
+restorecon -r /var/www/html
+#+BEGIN_SRC 
+he issue is caused when you mv something from one place to another.
+It preserves the selinux context of the original when you move it,
+so if you untar something in /home or /tmp it gets given an selinux 
+context that matches its location. Now you mv that to /var/www/html 
+and it takes the context saying it belongs in /tmp or /home with it 
+and httpd is not allowed by policy to access those files.
+If you cp the files instead of mv them, the selinux context
+gets assigned according to the location you're copying to, not where it's coming from. Running restorecon puts the context back to its default and fixes it too.
+#+END_SRC
+
+** (ubuntu) nginx: [emerg] bind() to 0.0.0.0:10080 failed 
+*** ubuntu
+nginx 有一個default group 叫做nginx
+把你開的nginx的user加入這個group,就可以跑了
+假設我用root
+#+BEGIN_SRC 
+usermod -aG nginx root
+#+END_SRC
+
+*** centos
+1. 檢查有沒有加pnginx group之外
+2. 檢查SElinux 設定
+2.1. 檢查應用程式
+#+BEGIN_SRC 
+semanage port -l | grep http_port_t
+#+END_SRC
+line:
+http_port_t                    tcp      80, 81, 443, 488, 8008, 8009, 8443, 9000
+2.2 
+#add
+#+BEGIN_SRC 
+semanage port -a -t http_port_t  -p tcp 10080
+#+END_SRC
+#modifier
+#+BEGIN_SRC 
+semanage port -m -t http_port_t -p tcp 5000
+#+END_SRC
+** 404 not found, help mehod
+ 1. sudo tail -n 20 /var/log/nginx/error.log
+
+

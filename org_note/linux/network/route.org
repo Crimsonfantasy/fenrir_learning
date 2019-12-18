@@ -1,0 +1,2 @@
+* target ip via target route with target device
+sudo ip  route add 122.147.59.82/32 via  192.168.21.254  dev ppp0

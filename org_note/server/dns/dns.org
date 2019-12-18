@@ -1,0 +1,2 @@
+* query target dns server for domain name
+dig @127.0.0.1  -p 8600  G1.slot-game.service.consul

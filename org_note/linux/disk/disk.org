@@ -1,0 +1,65 @@
+* sync disk
+** DRBD
+ - 常用於mysqly資料備份的, primary 機器壞了, 備援機器會啟動
+* lsyncd
+ - discription: inotify + rsync 的工具
+** 可以設定daemon server
+ 1. 參考 [[file:lsyncd/lsyncd.conf][config]] 
+ 2. 將config 放置 /etc/lsyncd.conf (Redhat配置)
+ 3. sudo systemctl start  lsyncd
+ 4. sudo systemctl status lsyncd
+** 參考網址
+ 1. [[https://axkibe.github.io/lsyncd/manual/config/][official web config documents]]
+ 2. [[https://www.linuxtechi.com/install-and-use-lsyncd-on-centos-7-rhel-7/][setting in redhet exmple]]
+* disk speed
+** write speed
+#+BEGIN_SRC 
+dd if=/dev/zero of=./largefile bs=1M count=1024
+dd if=/dev/zero of=/home/xx conv=fdatasync bs=384k count=1k; rm -f /home/xx
+#+END_SRC
+** read speed
+1. Run the following command to clear the memory cache
+   #+BEGIN_SRC 
+     sudo sh -c "sync && echo 3 > /proc/sys/vm/drop_caches"
+   #+END_SRC
+   Now read the file which was created in write test:   
+2. Now read the file which was created in write test:
+ dd if=./largefile of=/dev/null bs=4k
+*** read by hdprarm
+#+BEGIN_SRC 
+sudo hdparm -Tt /dev/sda
+#+END_SRC 
+
+* find disk type/ hard disk or ssd
+**  lsblk -d -o name,rota
+  1. 1 is rotational device, 0 is not (ssd)
+  NAME ROTA
+  sda     0
+  sdb     0
+  sdc     1
+  
+**  current system used
+   #+BEGIN_SRC 
+    cat /sys/block/sda/queue/rotational
+   #+END_SRC
+   
+* find folder which disk be used
+lsblk -l
+#+BEGIN_SRC 
+NAME MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+sdb    8:16   0 119.2G  0 disk 
+sdb4   8:20   0   980M  0 part 
+sdb2   8:18   0   128M  0 part 
+sdb3   8:19   0 117.8G  0 part 
+sdb1   8:17   0   360M  0 part /boot/efi
+sda    8:0    0 465.8G  0 disk 
+sda4   8:4    0    95M  0 part 
+sda2   8:2    0 217.9G  0 part 
+sda7   8:7    0  18.6G  0 part [SWAP]
+sda5   8:5    0  93.1G  0 part /home
+sda3   8:3    0     1M  0 part 
+sda1   8:1    0   128M  0 part 
+sda8   8:8    0  93.1G  0 part /
+sda6   8:6    0  27.9G  0 part 
+
+#+END_SRC

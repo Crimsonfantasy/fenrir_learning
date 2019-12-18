@@ -1,0 +1,3 @@
+* test cros
+curl -H 'Content-Type: application/json' -H 'Access-Control-Request-Method: POST' -H 'Origin: 127.0.0.1:8080' --head  -s -XPOST     --verbose 127.0.0.1:6969/pp/user/create
+

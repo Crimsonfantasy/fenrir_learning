@@ -1,0 +1,2 @@
+1. Pattern: Backends For Frontends
+2. Serverless Architectures

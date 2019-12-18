@@ -1,0 +1,30 @@
+* Finding last item in a line using grep
+** situation
+-rw-rw-r--  1 mango mango   205173 Oct 26  2018 bull2-GameExtension.jar
+drwxrwxr-x  5 mango mango     4096 Oct  9 15:39 game-extension
+drwx------  2 mango mango     4096 Oct  9 15:39 jdb168-game-server
+-rw-rw-r--  1 mango mango    68099 Oct 26  2018 lobby-GameExtension.jar
+-rw-rw-r--  1 mango mango 33562753 Oct 26  2018 mango-gameExtension-dependencies.jar
+drwxrwxr-x  2 mango mango     4096 Oct  8 16:30 report-cache
+-rw-rw-r--  1 mango mango   186044 Oct 26  2018 roulette-GameExtension.jar
+-rw-rw-r--  1 mango mango   143054 Oct 26  2018 sicbo-GameExtension.jar
+drwx------  2 mango mango     4096 Oct  9 15:39 slot-extension
+
+** result
+bull2-GameExtension.jar
+game-extension
+jdb168-game-server
+lobby-GameExtension.jar
+mango-gameExtension-dependencies.jar
+report-cache
+roulette-GameExtension.jar
+sicbo-GameExtension.jar
+slot-extension
+
+** command
+#+BEGIN_SRC 
+ls -l | grep Oct |grep   -o '[^\ ]\+$'
+#+END_SRC 
+ - [^,]\+ matches one or more characters that are not , at the end of the line ($)
+ - -o prints only the matched portion
+

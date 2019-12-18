@@ -1,0 +1,18 @@
+* ORA-14402: updating partition key column would cause a partition change
+  這是一個發生在 Partition Table 的問題, 例如我們以 Save_Time 當做分割 Partition 的欄位, 且一個月一個 Partition. 所以假設我們的 Table 裏有下列的 Partition.
+  PARTITION BY RANGE (Save_Time) (
+  PARTITION Par_2010_01 VALUES LESS THAN (TO_DATE(' 2010-02-01 ','YYYY-MM-DD')) TABLESPACE TBS_2010_01,
+  PARTITION Par_2010_02 VALUES LESS THAN (TO_DATE(' 2010-03-01 ','YYYY-MM-DD')) TABLESPACE TBS_2010_02,
+  PARTITION Par_2010_03 VALUES LESS THAN (TO_DATE(' 2010-04-01 ','YYYY-MM-DD')) TABLESPACE TBS_2010_03,
+  );
+  當有一筆資料原本存在 Par_2010_02(假設 Save_Time=2010.02.02), 然後我們更新它, 使得楚存的位置變到 Par_2010_03(假設 Save_Time=2010.03.02), 這是一個合理的情結, 但可能會出現 ORA-14402: updating partition key column would cause a partition change 的錯誤, 您必須 
+  alter table XXX enable row movement;
+** is enable row movement very costy? large overhead? 
+Tom Kyte
+Followup  
+January 13, 2004 - 5:44 pm UTC 
+no, it is an "attribute".
+
+only when the row actually "Moves" (due to an update of a partition key that moves partitions) would it incurr any "extra work" (it is like a delete + insert instead of just update then) 
+** reference
+https://asktom.oracle.com/pls/asktom/f%3Fp%3D100:11:0::::P11_QUESTION_ID:556422930651

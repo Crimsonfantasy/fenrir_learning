@@ -1,0 +1,14 @@
+* user manager
+** kill online user
+// 找出online user
+select sid,serial# from v$session where username = 'STREAM_SLOT';
+
+//刪除online使用者
+ALTER  SYSTEM  KILL SESSION 'sid,serial';
+ALTER  SYSTEM  KILL SESSION '52,14529';
+ALTER  SYSTEM  KILL SESSION '412,5';
+ALTER  SYSTEM  KILL SESSION '416,35399';
+
+** 刪除user
+你要先kill online user
+drop user stream_slot;

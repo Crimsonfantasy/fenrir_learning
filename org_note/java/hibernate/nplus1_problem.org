@@ -1,0 +1,34 @@
+* n+1 problem
+** 描述
+在Session的快取中存放的是相互關聯的物件圖。預設情況下，當Hibernate從資料庫中載入Customer物件時，會同時載入所有關聯的 Order物件。以Customer和Order類為例，假定ORDERS表的CUSTOMER_ID外來鍵允許為null
+以下Session的find()方法用於到資料庫中檢索所有的Customer物件：
+List customerLists=session.find("from Customer as c");
+執行以上find()方法時，Hibernate將先查詢CUSTOMERS表中所有的記錄，然後根據每條記錄的ID，到ORDERS表中查詢有參照關係的記錄，Hibernate將依次執行以下select語句：
+#+BEGIN_SRC 
+select * from CUSTOMERS; 
+select * from ORDERS where CUSTOMER_ID=1; 
+select * from ORDERS where CUSTOMER_ID=2; 
+select * from ORDERS where CUSTOMER_ID=3; 
+select * from ORDERS where CUSTOMER_ID=4;
+#+END_SRC
+通過以上5條select語句，Hibernate最後載入了4個Customer物件和5個Order物件，在記憶體中形成了一幅關聯的物件圖.
+Hibernate在檢索與Customer關聯的Order物件時，使用了預設的立即檢索策略。這種檢索策略存在兩大不足：
+select語句的數目太多，需要頻繁的訪問資料庫，會影響檢索效能。如果需要查詢n個Customer物件，那麼必須執行n 1次select查詢語 句。這就是經典的n 1次select查詢問題。這種檢索策略沒有利用SQL的連線查詢功能，例如以上5條select語句完全可以通過以下1條 select語句來完成：
+#+BEGIN_SRC 
+select * from CUSTOMERS left outer join ORDERS 
+on CUSTOMERS.ID=ORDERS.CUSTOMER_ID
+#+END_SRC
+以上select語句使用了SQL的左外連線查詢功能，能夠在一條select語句中查詢出CUSTOMERS表的所有記錄，以及匹配的ORDERS表的記錄。
+在應用邏輯只需要訪問Customer物件，而不需要訪問Order物件的場合，載入Order物件完全是多餘的操作，這些多餘的Order物件白白浪費了許多記憶體空間。
+為了解決以上問題，Hibernate提供了其他兩種檢索策略：延遲檢索策略和迫切左外連線檢索策略。延遲檢索策略能避免多餘載入應用程式不需要訪問的關聯物件，迫切左外連線檢索策略則充分利用了SQL的外連線查詢功能，能夠減少select語句的數目。
+對資料庫訪問還是必須考慮效能問題的， 在設定了1 對多這種關係之後， 查詢就會出現傳說中的n 1 問題。
+1. 1 對多，在1 方，查詢得到了n 個物件， 那麼又需要將n 個物件關聯的集合取出，於是本來的一條sql查詢變成了n 1 條
+2. 多對1 ，在多方，查詢得到了m個物件，那麼也會將m個物件對應的1 方的物件取出， 也變成了m 1
+** 怎麼解決n 1 問題？ 
+1. lazy=true
+   hibernate3開始已經預設是lazy=true了；lazy=true時不會立刻查詢關聯物件，只有當需要關聯物件（訪問其屬性，非id欄位）時才會發生查詢動作。
+2. 二級快取
+ 在物件更新，刪除，新增相對於查詢要少得多時， 二級快取的應用將不怕n 1 問題，因為即使第一次查詢很慢，之後直接快取命中也是很快的。 
+ 不同解決方法，不同的思路，第二條卻剛好又利用了n 1 。
+3. 當然你也可以設定fetch=join
+   (annotation : @ManyToOne() @Fetch(FetchMode.JOIN))

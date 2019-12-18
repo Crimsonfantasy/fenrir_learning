@@ -1,0 +1,6 @@
+* test server for listen
+  netcat -l 8080 (ubuntu)
+  nc -l 8080 (centos)
+* connect to test server
+1. netcat host port
+2. start to type something

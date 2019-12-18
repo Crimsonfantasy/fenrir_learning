@@ -1,0 +1,10 @@
+* show file modify
+#+BEGIN_SRC 
+state $fileName
+#+END_SRC
+stat tells you various information about the file including the last modified date.
+At first, I was confused with Modify and Change, just to clarify, stat output lists:
+Access shows the time of last data access (e.g. read).
+Modify shows the time of last data modification.
+Change shows the time the file status last changed.
+

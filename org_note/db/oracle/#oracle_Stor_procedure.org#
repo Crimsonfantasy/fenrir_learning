@@ -1,0 +1,108 @@
+* procedure
+** create procedure
+#+BEGIN_SRC 
+CREATE PROCEDURE sp_clean_boardcastboard AS
+BEGIN
+  -- 刪除已讀資訊
+  DELETE from BROADCASTBOARD where READ_FLAG = 1;
+   -- 刪除三分鐘以前的query item資訊
+  DELETE from BROADCASTBOARD where CREATE_TIME > (SYSDATE - (3/ 60 *24));
+END;
+/
+#+END_SRC
+** test exmaple:
+#+BEGIN_SRC 
+DECLARE
+  mm NUMBER;
+  msg VARCHAR2(20);
+BEGIN
+  SELECT c.MTYPE INTO mm from casino_game_history c where c.UID_A = 'kbtestpl01@KB' and c.BA_GAME_SEQ_NO = 2200292;
+  /* Find the location of the first "e" */
+  msg := 'result is ' || mm; /* Concatenate string */
+END;
+/
+#+END_SRC
+** ddl in storprocedure [注意]
+ddl 在store procedure 有特別的寫法: example
+[[file:ddl_in_store_procedure.sql][ddl {eg:truncate} in store procedure]]
+
+** exec DDL in procedure
+   what is DDL(Data Definition Language)?
+   用來定義資料庫、資料表、檢視表、索引、預存程序、觸發程序、函數等資料庫物件。
+   可以用來建立、更新、刪除 table,schema,domain,index,view
+   oracle使用ddl 必須連用execute immediate
+#+BEGIN_SRC 
+CREATE OR REPLACE PROCEDURE game_record_truncate IS
+  cc number;
+Begin
+    execute immediate 'TRUNCATE TABLE BULL2_BET_RESULT
+    PRESERVE MATERIALIZED VIEW LOG
+    REUSE STORAGE';
+END;
+#+END_SRC
+   注意： 
+1. execute immediate 內部只能有一個sql, 不能用分號隔開又用多個
+   see : [[%5B%5Boracle%20document%5D%5Bhttps://docs.oracle.com/cd/B28359_01/appdev.111/b28370/executeimmediate_statement.htm#LNPLS01317%5D%5D][oracle document]]
+* Job
+** delete Job
+   -- 刪除JOB
+#+BEGIN_SRC 
+BEGIN
+  dbms_job.remove(4);
+END;
+#+END_SRC
+** create Job
+-- 建立JOB
+#+BEGIN_SRC 
+declare
+  my_job number;
+begin
+  -- 1/1440 是一分鐘
+  dbms_job.submit(
+      job => my_job, -- 此為輸出變數
+      what => 'sp_clean_boardcastboard;', -- 執行的store procedure
+      next_date => SYSDATE, -- 第一次執行時間
+      interval => 'SYSDATE + 3/1440' -- 下次執行時間(三分鐘後執行一次)
+  );
+  dbms_output.put_line(my_job);
+  commit;
+end;
+#+END_SRC
+** list user Job
+   -- 查詢USER JOB
+#+BEGIN_SRC 
+select * from user_jobs;
+#+END_SRC
+** reference
+1. http://www.orafaq.com/node/871
+   
+* trigger
+* orale web infomation
+
+| function             | web-info                                                                         |
+|----------------------+----------------------------------------------------------------------------------|
+| Working with Strings | http://www.oracle.com/technetwork/issue-archive/2011/11-sep/o51plsql-453456.html |                       |                                                                                  |
+|----------------------+----------------------------------------------------------------------------------|
+|                      |                                                                                  |
+|                      |                                                                                  |
+
+* show user error
+#+BEGIN_SRC 
+SELECT * FROM user_errors WHERE TYPE = 'TRIGGER';
+#+END_SRC
+* transaction
+** AUTONOMOUS_TRANSACTION 
+1. 使用時機: 
+ - 目標table被修改時, trigger也對該table做查詢or 修改, 這被限制的, 因此用此將該trigger執行在不同的transaction上.
+2. reference:
+ - [[https://docs.oracle.com/cd/B19306_01/appdev.102/b14261/autonotransaction_pragma.htm][AUTONOMOUS_TRANSACTION in Oracle Helper Center]]
+ - 
+
+   
+* useful tool
+** println
+#+BEGIN_SRC <PL/SQL> 
+  dbms_output.put_line('Exact value of b is : ' || b);
+#+END_SRC
+
+   *

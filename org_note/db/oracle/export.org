@@ -1,0 +1,20 @@
+* expdp
+1. 
+  mkdir /oracle/dumps
+2. 
+  create directory D_P_D as '/oracle/dumps';
+  (option): grant all on directory DATA_PUMP_DIR to myuser; 
+3. 
+  3.1. expdp system/aaaa1234B schemas=stream_slot dumpfile=stream_slot.dpdmp directory=D_P_D
+   1. data only parameter : content=data_only
+  3.2. exp 
+   1. data only parameter: DATA_ONLY=y
+* import data
+imp system/aaaa1234B@192.168.18.120/XE BUFFER=64000 file=jbgame.dump data_only=y fromuser=jbgame touser=jbgame
+ 1. fromuser=jbgame touser=jbgame => 轉移schema
+ 2. data_only 只匯入data
+* move all sequence number to another max value
+select 'ALTER SEQUENCE ' || SEQUENCE_NAME || ' INCREMENT BY 10000;' from USER_SEQUENCES;
+select 'SELECT ' || SEQUENCE_NAME || '.NEXTVAL FROM dual;' from USER_SEQUENCES;
+select 'ALTER SEQUENCE  ' || SEQUENCE_NAME || ' INCREMENT BY 1;' from USER_SEQUENCES;
+

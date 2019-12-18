@@ -1,0 +1,15 @@
+* list LWP used by target process
+#+BEGIN_SRC 
+ ps -p 27975 -lfT 
+#+END_SRC
+
+*show memory usage
+#+BEGIN_SRC 
+ ps aux --sort -rss
+#+END_SRC
+* ps and cut together
+#+BEGIN_SRC 
+ps -ef | grep 8web | tr -s " " |  cut -d " "  -f 2 | xargs  kill $1
+#+END_SRC
+
+

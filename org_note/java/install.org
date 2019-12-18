@@ -1,0 +1,15 @@
+* install jmap
+** open jdk 
+** amazon corretto:
+1.到官網安裝amazon corretto
+  https://docs.aws.amazon.com/en_us/corretto/latest/corretto-8-ug/generic-linux-install.html
+2. yum
+ sudo yum localinstall java-1.8.0-amazon-corretto-devel-1.8.0_212.b04-2.x86_64.rpm
+*** fedora
+#+BEGIN_SRC 
+yum whatprovides '*/jmap'
+#+END_SRC
+這次安裝的package
+#+BEGIN_SRC 
+yum install java-1.8.0-openjdk-devel-debug
+#+END_SRC

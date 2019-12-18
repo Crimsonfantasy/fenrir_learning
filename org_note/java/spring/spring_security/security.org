@@ -1,0 +1,17 @@
+* 須告spring security role必須用ROLE_ 開頭
+https://docs.spring.io/spring-security/site/docs/current/reference/htmlsingle/#servletapi-user-in-role
+像是這樣:
+#+BEGIN_SRC 
+    private SimpleGrantedAuthority userAuth() {
+        return new SimpleGrantedAuthority("ROLE_USER");
+    }
+#+END_SRC
+在httpSecurity才能寫成
+#+BEGIN_SRC 
+        http.csrf().disable().anonymous()
+                .and()
+                .authorizeRequests()
+                .antMatchers("/pp/login")
+                .permitAll()
+                .antMatchers("/pp/slot/**").hasRole("USER")
+#+END_SRC

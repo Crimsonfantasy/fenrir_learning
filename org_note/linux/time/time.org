@@ -1,0 +1,12 @@
+* 對時：
+#+BEGIN_SRC 
+ ntpdate tick.stdtime.gov.tw
+#+END_SRC
+crontab 設定
+/sbin/hwclock 寫入機器時間
+#+BEGIN_SRC 
+x*/10 * * * * /usr/sbin/ntpdate tock.stdtime.gov.tw && /sbin/hwclock -w &> /dev/null
+#+END_SRC
+
+
+

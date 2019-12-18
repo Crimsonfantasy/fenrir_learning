@@ -1,0 +1,61 @@
+---
+- hosts: niu1
+  vars:
+    # report api
+    report_api_env: 'testServer'
+    report_api_build: 'report/reporter/build'
+    report_api_home: '/home/mango/mango-games/report/reporter'
+    # report daemon
+    report_daemon_env: 'testbed'
+    report_daemon_build: 'report/report-server/build'
+    report_daemon_home: '/home/mango/mango-games/report/report-server'
+  remote_user: mango
+  become_method: sudo
+  become_user: root
+  tasks:
+    - name: Stopping Report-api
+      systemd:
+        state: stopped
+        name: nn_report_api
+      become: true
+    - name: Stopping Report-damon
+      systemd:
+        state: stopped
+        name: nn_report_daemon
+      become: true
+    - name: Synchronization Report-api project
+      synchronize:
+        src: "{{report_api_build}}/libs/report-api-server.jar"
+        dest: "{{report_api_home}}/"
+    - name: Sync Report-api config
+      synchronize:
+        src: "{{report_api_build}}/config/{{report_api_env}}/config/"
+        dest: "{{report_api_home}}/config/"
+        delete: yes
+    - name: Synchronization Report-daemon project
+      synchronize:
+        src: "{{report_daemon_build}}/libs/"
+        dest: "{{report_daemon_home}}/"
+    - name: Sync Report-daemon config
+      synchronize:
+        src: "{{report_daemon_build}}/config/{{report_daemon_env}}/spring_boot/config/"
+        dest: "{{report_daemon_home}}/config/"
+        delete: yes
+    - name: Starting report api process
+      systemd:
+        state: started
+        name: nn_report_api
+        daemon_reload: yes
+      become: true
+    - name: Starting report damon process
+      systemd:
+        state: started
+        name: nn_report_daemon
+        daemon_reload: yes
+      become: true
+    - name: populate service facts
+      service_facts:
+    - debug:
+        var: ansible_facts.services['nn_report_daemon.service']
+    - debug:
+        var: ansible_facts.services['nn_report_api.service']

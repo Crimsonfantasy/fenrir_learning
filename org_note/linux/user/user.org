@@ -1,0 +1,15 @@
+* change user to sudo user
+1. chmod u+w /etc/sudoers
+2. sudo vi /etc/sudoers
+3. 參考root, 
+root    ALL=(ALL)       ALL
+#加這行
+oracle  ALL=(ALL)       ALL
+4. chmod u-w /etc/sudoers
+* add new user
+  adduser oracle
+** add user and assigned 2 group
+  1. usermod -g nginx daniel99
+* add user 2 group  
+  1. chgrp +aG xxGroup
+  2. sudo usermod -g nginx daniel99

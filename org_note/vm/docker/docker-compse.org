@@ -1,0 +1,13 @@
+* logging
+** journald in docker document
+ 1. [[https://docs.docker.com/config/containers/logging/journald/][journald]]
+** 設定
+#+BEGIN_SRC 
+    logging:
+      driver: journald
+#+END_SRC
+** 使用看log
+ 1. sudo journalctl CONTAINER_NAME=$containerName
+ 2. The -b flag only retrieves messages
+  : sudo journalctl -b CONTAINER_NAME=$containerName
+ 

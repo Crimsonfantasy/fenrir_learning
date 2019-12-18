@@ -1,0 +1,10 @@
+* rsocket-cli
+** no meta
+#+BEGIN_SRC 
+./rsocket-cli  --request -i "I am a Client" --debug tcp://localhost:9877
+#+END_SRC
+** with meta
+ -m : meta-data 
+#+BEGIN_SRC 
+./rsocket-cli -m hello_meta --request -i "I am a Client" --debug tcp://localhost:9877
+#+END_SRC

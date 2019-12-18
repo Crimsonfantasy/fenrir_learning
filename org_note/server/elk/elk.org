@@ -1,0 +1,11 @@
+* logstash
+** fetch clob in oracle database
+ * To Fetch CLOB data from Oracle using LogStash JDBC Input Plugin
+ * We are storing log Files in Oracle Table where Column is of type CLOB
+ * How can i retrieve the CLOB data and how can i filter this data.
+ * Each row contain 1 Log File (in CLOB data type column)
+ * Note: The character in each log file is more than 40,000.
+ * It will be really helpful if someone can provide some pointers Or examples for the same. I am new to ELK hence required some guidance.
+
+
+

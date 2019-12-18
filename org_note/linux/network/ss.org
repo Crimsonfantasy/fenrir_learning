@@ -1,0 +1,2 @@
+# find which process listening on  port 8880
+ss -tunlp | grep 8880

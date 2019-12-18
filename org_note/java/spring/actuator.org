@@ -1,0 +1,133 @@
+* actuator config
+** config spring mvc, traditional tomcat
+*** extends WebSecurityConfigurerAdapter
+*** override configure method
+#+BEGIN_SRC 
+  @Override
+  protected void configure(HttpSecurity http) throws Exception {
+  }
+        http.csrf().disable().anonymous()
+                .and()
+                // actuator framework
+                .authorizeRequests().antMatchers("/actuator/**").permitAll()
+                .and().authorizeRequests()
+                .antMatchers(Controllers.loginBaseUrl + "/**")
+                .permitAll()
+                .and()
+                .authorizeRequests()
+                .antMatchers(Controllers.streamMngBaseUrl + "/**")
+//                //不管任何人都可以看機器狀態
+                .hasRole("ADMINUSER")
+                .and()
+                .httpBasic()
+                .authenticationEntryPoint(initAuthenticationEntryPoint());
+    }
+#+END_SRC
+
+
+
+* endpoitn function
+** monitor
+** heap dump
+   download heapdump
+  http://192.168.18.148:6967/actuator/heapdump
+** threaddump
+   http://192.168.18.148:6967/actuator/threaddump
+** health
+   http http://localhost:6967/actuator/health
+#+BEGIN_SRC 
+{
+    "details": {
+        "db": {
+            "details": {
+                "database": "Oracle", 
+                "hello": "Hello"
+            }, 
+            "status": "UP"
+        }, 
+        "diskSpace": {
+            "details": {
+                "free": 34379616256, 
+                "threshold": 10485760, 
+                "total": 39700664320
+            }, 
+            "status": "UP"
+        }
+    }, 
+    "status": "UP"
+}
+
+#+END_SRC
+
+** /loggers：允许我们查询和修改应用的日志等级
+** metrics
+ 1. 查看metrics
+   http http://localhost:6967/actuator/metrics
+   如下： 
+    #+BEGIN_SRC 
+    {
+    "names": [
+        "jvm.threads.states", 
+        "jvm.gc.pause", 
+        "jdbc.connections.active", 
+        "cache.puts", 
+        "process.files.max", 
+        "cache.evictions", 
+        "jvm.gc.memory.promoted", 
+        "jvm.memory.used", 
+        "system.load.average.1m", 
+        "jvm.gc.max.data.size", 
+        "http.server.requests", 
+        "jdbc.connections.max", 
+        "jdbc.connections.min", 
+        "jvm.memory.committed", 
+        "system.cpu.count", 
+        "logback.events", 
+        "jvm.memory.max", 
+        "tomcat.global.sent", 
+        "jvm.buffer.memory.used", 
+        "tomcat.sessions.created", 
+        "jvm.threads.daemon", 
+        "system.cpu.usage", 
+        "jvm.gc.memory.allocated", 
+        "tomcat.global.request.max", 
+        "hikaricp.connections.idle", 
+        "hikaricp.connections.pending", 
+        "tomcat.global.request", 
+        "tomcat.sessions.expired", 
+        "hikaricp.connections", 
+        "cache.gets", 
+        "jvm.threads.live", 
+        "jvm.threads.peak", 
+        "tomcat.global.received", 
+        "hikaricp.connections.active", 
+        "hikaricp.connections.creation", 
+        "process.uptime", 
+        "tomcat.sessions.rejected", 
+        "process.cpu.usage", 
+        "tomcat.threads.config.max", 
+        "jvm.classes.loaded", 
+        "hikaricp.connections.max", 
+        "hikaricp.connections.min", 
+        "jvm.classes.unloaded", 
+        "tomcat.global.error", 
+        "tomcat.sessions.active.current", 
+        "tomcat.sessions.alive.max", 
+        "jvm.gc.live.data.size", 
+        "hikaricp.connections.usage", 
+        "tomcat.threads.current", 
+        "cache.removals", 
+        "hikaricp.connections.timeout", 
+        "process.files.open", 
+        "jvm.buffer.count", 
+        "jvm.buffer.total.capacity", 
+        "tomcat.sessions.active.max", 
+        "hikaricp.connections.acquire", 
+        "tomcat.threads.busy", 
+        "process.start.time"
+    ]
+}
+    #+END_SRC
+ 2. 查看指定metric
+   http http://localhost:6967/actuator/metrics/jvm.threads.states
+

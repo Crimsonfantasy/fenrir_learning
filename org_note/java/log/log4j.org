@@ -1,0 +1,17 @@
+
+* pattern config document
+
+[1] https://logging.apache.org/log4j/2.x/manual/layouts.html
+* reload confiFile
+  reload properties file 
+#+BEGIN_SRC 
+   PropertyConfigurator.configure(resource); for properties file
+ #+END_SRC
+  reload xml file
+#+BEGIN_SRC 
+    DOMConfigurator.configure(resource);
+#+END_SRC
+              
+            
+* document
+https://logging.apache.org/log4j/1.2/manual.html

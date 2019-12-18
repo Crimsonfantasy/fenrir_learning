@@ -1,0 +1,9 @@
+* 相關知識
+**  https://zookeeper.apache.org/doc/r3.3.5/zookeeperStarted.html#sc_InstallingSingleMode
+**  https://stackoverflow.com/questions/2115900/is-it-possible-to-reload-log4j-xml-log4j-properties-file-dynamically-in-tomcat
+** ZooKeeper commands
+http://www.corejavaguru.com/bigdata/zookeeper/cli
+** cli command
+https://www.tutorialspoint.com/zookeeper/zookeeper_cli.htm
+** watch detail
+http://zookeeper.apache.org/doc/current/zookeeperProgrammers.html#ch_zkWatches

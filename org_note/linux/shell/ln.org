@@ -1,0 +1,4 @@
+* Q & A
+udo ln -s  $(pwd)/firefox/firefox /usr/bin/firefox
+#+END_SRC
+

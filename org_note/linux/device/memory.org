@@ -1,0 +1,4 @@
+* show total memory
+ - free -h ( byte-format of output: -h, -k, -m, -g)
+ - cat /proc/meminfo |grep MemTotal
+ - vmstat -s

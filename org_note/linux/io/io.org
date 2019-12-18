@@ -1,0 +1,19 @@
+* monite io performance
+** iostat
+*** 查看目前用了多少iops
+iostat -d -m -t 2 10
+Device:            tps    MB_read/s    MB_wrtn/s    MB_read    MB_wrtn
+sda               9.72         0.00         0.18      12543     666546
+dm-0             33.86         0.00         0.18      11570     664741
+dm-1              0.16         0.00         0.00        931       1391
+表示對sda disk目前一秒有9.72 request
+
+- iozone
+- vmstat
+- sar
+** dstat disk usage statistic 
+example:
+#+BEGIN_SRC 
+dstat -tdD sda1
+#+END_SRC
+

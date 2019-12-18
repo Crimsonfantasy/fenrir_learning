@@ -1,0 +1,100 @@
+* redis install
+** centos 
+ 0. 進第一層目錄
+    : cd redis.xxx/
+ 1. yum install gcc
+ 2. yum install jemalloc
+ 3. 發生jemalloc/jemalloc.h: No such file or directory
+    : make distclean  && make
+    正常
+    : make
+* redis-cli functions
+** login
+redis-cli -a password
+** keys patttern
+ Returns all keys matching pattern.
+ While the time complexity for this operation is O(N),
+ the constant times are fairly low. For example, 
+ Redis running on an entry level laptop can scan a 1 million key database in 40 milliseconds.
+
+#+BEGIN_EXAMPLE
+    h?llo matches hello, hallo and hxllo
+    h*llo matches hllo and heeeello
+    h[ae]llo matches hello and hallo, but not hillo
+    h[^e]llo matches hallo, hbllo, ... but not hello
+    h[a-b]llo matches hallo and hbllo
+#+END_EXAMPLE
+
+[[https://redis.io/commands/keys][key pattern forn official]]
+** delete key by pattern
+example:
+#+BEGIN_SRC shell
+./redis-cli -h 192.168.18.148 -a mango.net --scan --pattern  \* | xargs ./redis-cli -h 192.168.18.148  -a mango.net del
+#+END_SRC
+* redis
+** java client https://www.baeldung.com/java-redis-lettuce
+** GUI tool
+RedisDesktopManager
+ - install
+sudo snap install redis-desktop-manager
+* 系統優化
+** Transparent Huge Pages
+   Redis在启动时可能会看到如下日志：
+WARNING you have Transparent Huge Pages (THP) support enabled in your kernel. This will create latency and memory usage issues with Redis. To fix this issue run the command 'echo never > /sys/kernel/mm/transparent_hugepage/enabled' as root, and add it to your /etc/rc.local in order to retain the setting after a reboot. Redis must be restarted after THP is disabled.
+从提示看Redis建议修改Transparent Huge Pages (THP)的相关配置，Linux kernel在2.6.38内核增加了Transparent Huge Pages (THP)特性 ，支持大内存页(2MB)分配，默认开启。当开启时可以降低fork子进程的速度，但fork之后，每个内存页从原来4KB变为2MB，会大幅增加重写期间父进程内存消耗。同时每次写命令引起的复制内存页单位放大了512倍，会拖慢写操作的执行时间，导致大量写操作慢查询。例如简单的incr命令也会出现在慢查询中。因此Redis日志中建议将此特性进行禁用，禁用方法如下：
+echo never >  /sys/kernel/mm/transparent_hugepage/enabled
+而且为了使机器重启后THP配置依然生效，可以在/etc/rc.local中追加echo never > /sys/kernel/mm/transparent_hugepage/enabled。
+在设置THP配置时需要注意：有些Linux的发行版本没有将THP放到/sys/kernel/mm/transparent_hugepage/enabled中，例如Red Hat 6以上的THP配置放到/sys/kernel/mm/redhat_transparent_hugepage/enabled中。而Redis源码中检查THP时，把THP位置写死。
+#+BEGIN_SRC 
+FILE *fp = fopen("/sys/kernel/mm/transparent_hugepage/enabled","r");
+if (!fp) return 0;
+#+END_SRC
+所以在发行版中，虽然没有THP的日志提示，但是依然存在THP所带来的问题。
+echo never >  /sys/kernel/mm/redhat_transparent_hugepage/enabled
+
+**  内存分配控制
+1. vm.overcommit_memory
+Redis在启动时可能会出现这样的日志：
+# WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the 
+command 'sysctl vm.overcommit_memory=1' for this to take effect.
+在分析这个问题之前，首先要弄清楚什么是overcommit？Linux操作系统对大部分申请内存的请求都回复yes，以便能运行更多的程序。因为申请内存后，并不会马上使用内存，这种技术叫做overcommit。如果Redis在启动时有上面的日志，说明vm.overcommit_memory=0，Redis提示把它设置为1。
+vm.overcommit_memory用来设置内存分配策略，它有三个可选值，如下表所示。
+vm.overcommit_memory	含义
+| vm.overcommit_memory | mean                                                                                                                                           |
+|----------------------+------------------------------------------------------------------------------------------------------------------------------------------------|
+|                    0 | 表示内核将检查是否有足够的可用内存。如果有足够的可用内存，内存申请通过，否则内存申请失败，并把错误返回给应用进程                               |
+|                    1 | 表示内核允许超量使用内存直到用完为止                                                                                                           |
+|                    2 | 表示内核决不过量的(“never overcommit”)使用内存，即系统整个内存地址空间不能超过swap+50%的RAM值，50%是overcommit_ratio默认值，此参数同样支持修改 |
+|                      |                                                                                                                                                |
+
+#+BEGIN_SRC 
+ 注意：本文的可用内存代表物理内存与swap之和。
+#+END_SRC
+日志中的Background save代表的是bgsave和bgrewriteaof，如果当前可用内存不足，操作系统应该如何处理fork。如果vm.overcommit_memory=0，代表如果没有可用内存，就申请内存失败，对应到Redis就是fork执行失败，在Redis的日志会出现：
+#+BEGIN_SRC 
+ Cannot allocate memory
+#+END_SRC
+
+Redis建议把这个值设置为1, 是为了让fork能够在低内存下也执行成功
+
+*** 获取和设置
+获取：
+#+BEGIN_SRC 
+ cat /proc/sys/vm/overcommit_memory
+ 0
+
+#+END_SRC
+设置：
+#+BEGIN_SRC 
+echo "vm.overcommit_memory=1" >> /etc/sysctl.conf
+sysctl vm.overcommit_memory=1
+
+#+END_SRC
+*** 最佳实践
+Redis设置合理的maxmemory，保证机器有20%~30%的闲置内存。
+集中化管理aof重写和rdb的bgsave。
+设置vm.overcommit_memory=1，防止极端情况下，会造成fork失败。
+** refer
+1. [[https://cachecloud.github.io/2017/02/16/Redis%25E7%259A%2584Linux%25E7%25B3%25BB%25E7%25BB%259F%25E4%25BC%2598%25E5%258C%2596/#chapter3][master of redis from china]]
+
+

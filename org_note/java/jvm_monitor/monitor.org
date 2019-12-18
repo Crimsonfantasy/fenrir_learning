@@ -1,0 +1,213 @@
+* thread dump
+** jstack
+  jstack -l JAVA_PID > jstack.out
+** jcmd
+ jcmd MyProgram help Thread.print
+  jcmd MyProgram Thread.print
+* heap dump
+** jmap
+版本必須相容
+jmap -dump:format=b,file=heap_dump.hprof 4988
+** jcmd
+jcmd 12587 GC.heap_dump /tmp/dump.hprof
+* jstack
+** description
+jstack用于生成java虚拟机当前时刻的线程快照。
+线程快照是当前java虚拟机内每一条线程正在执行的方法堆栈的集合，
+生成线程快照的主要目的是定位线程出现长时间停顿的原因，如线程间死锁、死循环、请求外部资源导致的长时间等待等。
+ 线程出现停顿的时候通过jstack来查看各个线程的调用堆栈，就可以知道没有响应的线程到底在后台做什么事情，
+或者等待什么资源。 如果java程序崩溃生成core文件，jstack工具可以用来获得core文件的java stack和native stack的信息，
+从而可以轻松地知道java程序是如何崩溃和在程序何处发生问题。另外
+，jstack工具还可以附属到正在运行的java程序中，看到当时运行的java程序的java stack和native stack的信息,
+如果现在运行的java程序呈现hung的状态，jstack是非常有用的。
+
+** option
+    -F  to force a thread dump. Use when jstack <pid> does not respond (process is hung)
+    -m  to print both java and native frames (c/c++ thread dump) (mixed mode)
+    -l  long listing. Prints additional information about locks
+** jstack optput discription:
+- nid : native thread id
+- 
+
+* jmap
+** option
+*** -histo
+ jmap -histo:live 28920 | more
+ live只統計活對象
+*** -heap
+ jmap -heap 28920 
+打印heap的概要信息，GC使用的算法，heap的配置及wise heap的使用情况,可以用此来判断内存目前的使用情况以及垃圾回收情况
+
+*** -dump
+*** -finalizerinfo
+jmap -finalizerinfo 28920
+显示在F-Queue队列等待Finalizer线程执行finalizer方法的对象
+
+ jmap -dump:live,format=b,file=dump.hprof 28920
+* JAVA Thread Moniting
+1. top 
+2. 找出java process的$pid
+3. top -H -p $pid => 你看到該process用到的thread ids($nid) ＄nid這東西叫做lwp
+用ps看 
+#+BEGIN_SRC 
+ ps -e -T | grep $pid
+#+END_SRC
+4. jstack -l $pid
+5. 將$nid由10進位轉成16進位, 搜尋jstack的nid: 如下
+#+BEGIN_SRC ｜
+"main" #1 prio=5 os_prio=0 tid=0x00007f3cc400e000 nid=0x1f9b runnable [0x00007f3ccc50d000]
+   java.lang.Thread.State: RUNNABLE
+        at com.jumbo.games.shared.model.roulette.TestBusy.busy(TestBusy.java:13)
+        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+        at java.lang.reflect.Method.invoke(Method.java:498)
+        at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
+        at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+        at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
+        at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+        at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:325)
+        at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:78)
+        at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:57)
+        at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+        at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+        at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+        at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+        at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+        at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+        at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+        at com.intellij.junit4.JUnit4IdeaTestRunner.startRunnerWithArgs(JUnit4IdeaTestRunner.java:68)
+        at com.intellij.rt.execution.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:47)
+        at com.intellij.rt.execution.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:242)
+        at com.intellij.rt.execution.junit.JUnitStarter.main(JUnitStarter.java:70)
+#+END_SRC
+** 工具:
+*** 一直印的jstack
+    參考share [[file:threaddump_linux_jstack-continuous.sh][continuous-jstack]]
+
+* virtual vm
+  jvisualvm
+** remote:
+1. remote machine開jstat
+ - jstatd -J-Djava.security.policy=jstat.policy -J-Djava.rmi.server.hostname=192.168.18.135 -p 1099
+ - policy 全開
+#+BEGIN_SRC 
+grant codebase "file:${java.home}/../lib/tools.jar" {                                   
+ permission java.security.AllPermission;                                                
+};                                                                                      
+#+END_SRC
+2. 本地visualVm連線jstatd
+*** remote visualVM 不能看heap dump
+ 1. jmap -dump:format=b,file=heap_dump.hprof 4988
+ 2. 用MAT工具或jhat觀看hprof
+* JMX
+jmxremote.access
+#+BEGIN_SRC 
+monitorRoleUser   readonly
+controlRoleUser   readwrite \
+              create javax.management.monitor.*,javax.management.timer.* \
+              unregister
+#+END_SRC
+jmxremote.password
+#+BEGIN_SRC 
+monitorRoleUser  pass1
+controlRoleUser  pass2
+#+END_SRC
+JVM_OPTS
+#+BEGIN_SRC 
+AVA_OPTS="$JAVA_OPTS -Dcom.sun.management.jmxremote=true"
+JAVA_OPTS="$JAVA_OPTS -Dcom.sun.management.jmxremote.port=1099"
+JAVA_OPTS="$JAVA_OPTS -Dcom.sun.management.jmxremote.ssl=false"
+JAVA_OPTS="$JAVA_OPTS -Dcom.sun.management.jmxremote.authenticate=true"
+JAVA_OPTS="$JAVA_OPTS -Dcom.sun.management.jmxremote.access.file=Path_to_access_file/jmxremote.access"
+JAVA_OPTS="$JAVA_OPTS -Dcom.sun.management.jmxremote.password.file=Path_to_password_file/jmxremote.password"
+#多網卡須加這個
+JAVA_OPTS="$JAVA_OPTS -Djava.rmi.server.hostname=192.168.18.111"
+#+END_SRC
+* discover lock
+1. 抓起stacktrace, jstack pid > ll
+   會拿到像這樣的output
+ #+BEGIN_SRC 
+        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1127)
+        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+        at java.lang.Thread.run(Thread.java:745)
+
+"qtp931548023-6611" #6611 prio=5 os_prio=0 tid=0x00007fcee002b800 nid=0x52b3 runnable [0x00007fce8a3c6000]
+   java.lang.Thread.State: RUNNABLE
+        at sun.nio.ch.EPollArrayWrapper.epollWait(Native Method)
+        at sun.nio.ch.EPollArrayWrapper.poll(EPollArrayWrapper.java:269)
+        at sun.nio.ch.EPollSelectorImpl.doSelect(EPollSelectorImpl.java:93)
+        at sun.nio.ch.SelectorImpl.lockAndDoSelect(SelectorImpl.java:86)
+        - locked <0x00000000f8c618c8> (a sun.nio.ch.Util$3)
+        - locked <0x00000000f8c618d8> (a java.util.Collections$UnmodifiableSet)
+        - locked <0x00000000f8c61880> (a sun.nio.ch.EPollSelectorImpl)
+        at sun.nio.ch.SelectorImpl.select(SelectorImpl.java:97)
+        at sun.nio.ch.SelectorImpl.select(SelectorImpl.java:101)
+        at org.eclipse.jetty.io.ManagedSelector$SelectorProducer.select(ManagedSelector.java:243)
+        at org.eclipse.jetty.io.ManagedSelector$SelectorProducer.produce(ManagedSelector.java:191)
+        at org.eclipse.jetty.util.thread.strategy.ExecuteProduceConsume.executeProduceConsume(ExecuteProduceConsume.java:249)
+        at org.eclipse.jetty.util.thread.strategy.ExecuteProduceConsume.produceConsume(ExecuteProduceConsume.java:148)
+        at org.eclipse.jetty.util.thread.strategy.ExecuteProduceConsume.run(ExecuteProduceConsume.java:136)
+        at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:671)
+        at org.eclipse.jetty.util.thread.QueuedThreadPool$2.run(QueuedThreadPool.java:589)
+        at java.lang.Thread.run(Thread.java:745)
+
+"GameEventManager-thread-1932" #6610 prio=5 os_prio=0 tid=0x00007fcee8017000 nid=0x525d waiting on condition [0x00007fce8a4c7000]
+   java.lang.Thread.State: TIMED_WAITING (parking)
+        at sun.misc.Unsafe.park(Native Method)
+        - parking to wait for  <0x00000000f850bd28> (a java.util.concurrent.SynchronousQueue$TransferStack)
+        at java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:215)
+        at java.util.concurrent.SynchronousQueue$TransferStack.awaitFulfill(SynchronousQueue.java:460)
+        at java.util.concurrent.SynchronousQueue$TransferStack.transfer(SynchronousQueue.java:362)
+        at java.util.concurrent.SynchronousQueue.poll(SynchronousQueue.java:941)
+        at java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1066)
+        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1127)
+        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+        at java.lang.Thread.run(Thread.java:745)
+#+END_SRC
+   觀察output有locked<{locationX}>的字眼. ex
+ #+BEGIN_SRC 
+   - parking to wait for  <0x00000000f850bd28> (a java.util.concurrent.SynchronousQueue$TransferStack)
+   0x00000000f850bd28 表示locked SynchronousQueue$TransferStack這個物件位置是0x00000000f850bd28
+#+END_SRC
+2. 發現lock location的位置是一樣的, 表示二邊程式在互強lock
+   可以用指令
+ #+BEGIN_SRC 
+ cat  ll |grep locked | uniq -c
+ #+END_SRC
+   結果如下
+ #+BEGIN_SRC 
+  發生次數
+      1 	- locked <0x00000000f8c618c8> (a sun.nio.ch.Util$3)
+      1 	- locked <0x00000000f8c618d8> (a java.util.Collections$UnmodifiableSet)
+      1 	- locked <0x00000000f8c61880> (a sun.nio.ch.EPollSelectorImpl)
+      1 	- locked <0x00000000f8c61528> (a sun.nio.ch.Util$3)
+      1 	- locked <0x00000000f8c61538> (a java.util.Collections$UnmodifiableSet)
+      1 	- locked <0x00000000f8c614e0> (a sun.nio.ch.EPollSelectorImpl)
+      1 	- locked <0x00000000f8da0e00> (a sun.nio.ch.Util$3)
+      1 	- locked <0x00000000f8da0e10> (a java.util.Collections$UnmodifiableSet)
+      1 	- locked <0x00000000f8da0db8> (a sun.nio.ch.EPollSelectorImpl)
+      1 	- locked <0x00000000f8c61aa8> (a sun.nio.ch.Util$3)
+      1 	- locked <0x00000000f8c61ab8> (a java.util.Collections$UnmodifiableSet)
+      1 	- locked <0x00000000f8c61a60> (a sun.nio.ch.EPollSelectorImpl)
+      1 	- locked <0x00000000f8cdea28> (a java.util.TaskQueue)
+      1 	- locked <0x00000000f87b92f0> (a java.util.TaskQueue)
+      1 	- locked <0x00000000f8cdeb08> (a sun.nio.ch.Util$3)
+      1 	- locked <0x00000000f8cdeb18> (a java.util.Collections$UnmodifiableSet)
+      1 	- locked <0x00000000f8cdeac0> (a sun.nio.ch.EPollSelectorImpl)
+      1 	- locked <0x00000000f8c61628> (a sun.nio.ch.Util$3)
+      1 	- locked <0x00000000f8c61638> (a java.util.Collections$UnmodifiableSet)
+      1 	- locked <0x00000000f8c615e0> (a sun.nio.ch.EPollSelectorImpl)
+      1 	- locked <0x00000000f8c61778> (a sun.nio.ch.Util$3)
+      1 	- locked <0x00000000f8c61788> (a java.util.Collections$UnmodifiableSet)
+#+END_SRC
+* runtie performance tracing
+** YourKit
+開remote debug + intellK pulgin 就能使用了
+** JProfiler
+ 提供:
+ 1. db method monitor
+ 2. method statisitc
+ 3. call tree, 某行程式被執行的次數
+ 4. live memory
+ 5. head walker

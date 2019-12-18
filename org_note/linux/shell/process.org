@@ -1,0 +1,6 @@
+* show process use which port
+ lsof -n -i | grep ${pid}
+* How can I know the absolute path of a running process?
+1. ps -auxwe | grep 24466
+2. pwdx $pid
+3. pwdx `pgrep ###process_name###`

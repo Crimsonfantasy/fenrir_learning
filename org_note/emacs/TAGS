@@ -1,0 +1,29 @@
+
+nxml.org,265
+   <?xml version=8,160
+ * its local name must match nxml-section-element-name-regexp;regexp98,2169
+ * either its first child element or a descendant of that first child element must have a local name that matches nxml-heading-element-name-regexp;regexp99,2232
+
+default_function.org,87
+  - get rid of garbage code,3,29
+  - get rid of garbage code, ex debug code etc,3,29
+
+speedbar.org,29
+In the speedbar window,2,39
+
+key-bind.org,394
+Lists all the bindings currently available,5,122
+Lists all the bindings currently available, use isearch,5,122
+Lists all the bindings currently available, use isearch, occur,5,122
+This shows all the bindings available from the current mode,7,243
+This shows all the bindings available from the current mode, you can use the display buffer as you would any other readonly Emacs buffer,7,243
+
+find_function.org,0
+
+awesom-tool.org,0
+
+web-guild.org,0
+
+emacs_language.org,0
+
+java.org,0

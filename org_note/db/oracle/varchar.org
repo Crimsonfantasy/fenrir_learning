@@ -1,0 +1,9 @@
+
+* varchar2 vs clob
+Pre-12c: varchar2 is limited to 4000 bytes. If you need to store more data in a field, go for CLOB.
+From 12c: varchar2 is limited to 4000 bytes, or 32767 bytes after enabling Extended datatypes. If you need to store more data in a field, go for CLOB. With Extended datatypes, varchar2 is stored as a LOB internally, where "short" fields go to the table segment, while "long" fields go to the LOB segment.
+Both types can be indexed (Oracle Text).
+LOBs are designed to be written once, then treat as read-only data. DML operations on existing LOB data typically perform worse than on varchar2.
+LOBs support deduplication (requires the Advanced Compression option).
+Depending on the use-case, varchar2 can perform better or same.
+But based on what you wrote above (read-only data, column is not accessed or searched), CLOB should be fine, and you do not need to fiddle with Extended Datatypes or care about the limitations of varchar2.

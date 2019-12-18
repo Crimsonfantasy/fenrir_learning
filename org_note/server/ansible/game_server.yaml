@@ -1,0 +1,66 @@
+---
+- hosts: niu1
+  vars:
+    http_port: 80
+    max_clients: 200
+    smart_fox_home: '/home/mango/bull2SmartFox/SFS2X'
+    hz_home: '/home/mango/mango-games/game-hz'
+    server_env: 'testServer'
+  remote_user: mango
+  tasks:
+#    - name: current dictionary
+#      debug:
+#        msg: " dictionary python:{{ls_msg}}}"
+    - name: Go to the SmartFoxHome && Stop SmartFox
+      ignore_errors: yes
+      shell: "./sfs2x-service stop"
+      args:
+        chdir: "{{smart_fox_home}}"
+    - name: Get running hz-server process from remote host
+      ignore_errors: yes
+      shell: "ps -ef | grep '[g]ame-hz' | awk '{print $2}'"
+      register: hz_processes
+    - name: Printing the process IDs obtained
+      debug:
+        msg: "PIDS of python:{{hz_processes}}}"
+    - name: kill game-hz
+      ignore_errors: yes
+      shell: "kill -9 {{item}}"
+      with_items: "{{ hz_processes.stdout_lines }}"
+    - name: Copy Lobby jar
+      copy:
+        src: lobby/build/libs/lobby-GameExtension.jar
+        dest: "{{smart_fox_home}}/extensions/roulette/lobby-GameExtension.jar"
+    - name: Copy Bull2 jar
+      copy:
+        src: bull2/gameServerBull2/build/libs/bull2-GameExtension.jar
+        dest: "{{smart_fox_home}}/extensions/sicbo/bull2-GameExtension.jar"
+    - name: Copy Roulette jar
+      copy:
+        src: roulette/rouletteServer/build/libs/roulette-GameExtension.jar
+        dest: "{{smart_fox_home}}/extensions/roulette/roulette-GameExtension.jar"
+    - name: Copy SicBo jar
+      copy:
+        src: sicbo/sicbo-server/build/libs/sicbo-GameExtension.jar
+        dest: "{{smart_fox_home}}/extensions/sicbo/sicbo-GameExtension.jar"
+    - name: Copy GameLib jar
+      copy:
+        src: bull2/gameServerBull2/build/libs/mango-gameExtension-dependencies.jar
+        dest: "{{smart_fox_home}}/extensions/__lib__/mango-gameExtension-dependencies.jar"
+    - name: Synchronization Game config
+      synchronize:
+        src: "lobby/build/config/{{server_env}}/SFS2X/"
+        dest: "{{smart_fox_home}}/"
+    - name: Start GameHZ
+      shell: "nohup java -jar game-hz-0.0.1-SNAPSHOT.jar &"
+      args:
+        chdir: "{{hz_home}}"
+    - name: Wait HZ start,  don't start checking for 10 seconds,and then  waiting hz starting
+      wait_for:
+        host: 0.0.0.0
+        port: 5701
+        delay: 10
+    - name: Start SmartFox
+      shell: "./sfs2x-service start"
+      args:
+        chdir: "{{smart_fox_home}}"

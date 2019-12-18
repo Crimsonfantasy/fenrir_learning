@@ -1,0 +1,20 @@
+* action 
+** this is a example => lof
+   My father
+ 1. fjkl
+    + /sdfsdklfjksdl/  => /italic/
+    + _sdfjksdl_   => _underlined_
+    + =dfl;sdfk;=  =>  =verbatim=
+    + ~dfks;ldfkl;~   => ~code~
+    + dlsfksdlf;sdk
+ 2. sdfjklsdjfklsdjkfld
+    - dsjkljsdklfjkls
+    - dsf;lsdjf => *M-RET     (org-insert-heading)*
+    - sdlfjlsdjklsd;lfjsdkl
+    - sdflsdkl;
+    - safklsk;flksl;
+    - saflksd;lfksdl
+ 3. sdfjsdklfjskldjfjklsdjfkljsdkl
+    1. [O] *M-S-RET, Insert a new item with a checkbox*   => *blod*
+    2. [O] 
+    3. [X] 

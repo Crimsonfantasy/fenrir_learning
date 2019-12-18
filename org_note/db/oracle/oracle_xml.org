@@ -1,0 +1,35 @@
+* xml in db
+** create table
+   create table STREAM_SLOT.SLOT_USER_PREFERENCE
+   (
+   UID_A VARCHAR2(50) not null
+   constraint SLOT_USER_PREFERENCE_PK
+   primary key,
+   PREFERENCE XMLTYPE
+   )
+   /
+** alter
+   ALTER TABLE SLOT_USER_PREFERENCE
+   add (DATA XMLType);
+   
+** insert xml   
+   insert into SLOT_USER_PREFERENCE
+   values ('11111', XMLType('
+   <Warehouse whNo="100">
+   <Building>Owned</Building>
+   </Warehouse>'));
+   
+** find xml element
+   SELECT UID_A, PREFERENCE
+   FROM SLOT_USER_PREFERENCE
+   WHERE XMLExists('/Warehouse[Building="AA"]'
+   PASSING PREFERENCE);
+** update one attribute   
+   UPDATE SLOT_USER_PREFERENCE
+   SET PREFERENCE = updateXML(PREFERENCE, '/Warehouse/Building/text()', 'AA');
+   
+** find attribute in xml
+   SELECT UID_A, PREFERENCE
+   FROM SLOT_USER_PREFERENCE
+   WHERE XMLExists('/lastPlay/bet[@roomName="s1"]'
+                PASSING PREFERENCE);

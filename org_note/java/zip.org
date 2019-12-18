@@ -1,0 +1,4 @@
+* java 可信任zip jar
+** zip4j
+1. 原生jdk對ZipFile對中文支援有問題
+2. Apache的Zip沒有支援加密

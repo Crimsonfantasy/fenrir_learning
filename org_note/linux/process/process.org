@@ -1,0 +1,104 @@
+* 看某process開啟哪些資源
+ls -l /proc/103596/fd
+* look thread resources in process
+ls /proc/$(pid)/task/
+* kill zombie process
+sudo telinit U
+
+* start daemon when booting
+- chkconfig rabbitmq-server on
+* STATE
+** Linux 进程的 Uninterruptible sleep(D) 状态
+*** 介紹
+  运行在 KVM 虚拟机里的一些进程突然出了问题，这些出了问题的进程无法用 kill 杀掉，使用 ps 可以看到这些进程处于D 状态：
+
+[build@kbuild-john ~]$ ps -a -ubuild -o pid,ppid,stat,command
+  PID  PPID STAT COMMAND
+17009     1 Ds   -bash
+17065     1 D    ls --color=tty -al
+17577     1 D    /usr/java/jdk1.5.0_17/bin/java -Xmx512m -classpath /usr/local/a
+17629     1 D    /usr/java/jdk1.5.0_17/bin/java -Xmx512m -classpath /usr/local/a
+
+  ps 的手册里说 D 状态是 uninterruptible sleep，Linux 进程有两种睡眠状态，一种 interruptible sleep，处在这种睡眠状态的进程是可以通过给它发信号来唤醒的，比如发 HUP 信号给 nginx 的 master 进程可以让 nginx 重新加载配置文件而不需要重新启动 nginx 进程；另外一种睡眠状态是 uninterruptible sleep，处在这种状态的进程不接受外来的任何信号，这也是为什么之前我无法用 kill 杀掉这些处于 D 状态的进程，无论是 kill, kill -9 还是 kill -15，因为它们压根儿就不受这些信号的支配。
+进程为什么会被置于 uninterruptible sleep 状态呢？处于 uninterruptible sleep 状态的进程通常是在等待 IO，比如磁盘 IO，网络 IO，其他外设 IO，如果进程正在等待的 IO 在较长的时间内都没有响应，那么就很会不幸地被 ps 看到了，同时也就意味着很有可能有 IO 出了问题，可能是外设本身出了故障，也可能是比如挂载的远程文件系统已经不可访问了，我这里遇到的问题就是由 down 掉的 NFS 服务器引起的。
+正是因为得不到 IO 的相应，进程才进入了 uninterruptible sleep 状态，所以要想使进程从 uninterruptible sleep 状态恢复，就得使进程等待的 IO 恢复，比如如果是因为从远程挂载的 NFS 卷不可访问导致进程进入 uninterruptible sleep 状态的，那么可以通过恢复该 NFS 卷的连接来使进程的 IO 请求得到满足，除此之外，要想干掉处在 D 状态进程就只能重启整个 Linux 系统了。
+看到有人说如果要想杀掉 D 状态的进程，通常可以去杀掉它的父进程（通常是 shell，我理解的这种情况是在 shell 下直接运行的该进程，之后该进程转入了 D 状态），于是我就照做了，之后就出现了上面的状态：他们的父进程被杀掉了，但是他们的父进程 PID 都变成了1，也就是 init 进程，这下可如何是好？此时我这些D状态的进程已经影响到其他一些进程的运行，而已经无法访问的 NFS 卷又在段时间内无法恢复，那么，只好重新启动了，root 不是玉皇大帝，也有无奈的时候。
+跟 czhang 说起这个事，觉得 Linux 如果有这么一个专用的垃圾回收进程就好了：系统自动或者用户手动把僵尸进程，和比如之前我遇到的 D 状态进程的 PPID 设为这个垃圾回收进程，那么通过干掉这个垃圾回收进程来清理这些僵尸们，这样该有多美好…
+
+*** CPU load average and uninterruptible sleeep
+  这里要区别CPU负载和CPU利用率，它们是不同的两个概念，但它们的信息可以在同一个top命令中进行显示。CPU利用率显示的是程序在运行期间实时占用的CPU百分比，这是对一个时间段内CPU使用状况的统计，通过这个指标可以看出在某一个时间段内CPU被占用的情况， 如果被占用时间很高，那么就需要考虑CPU是否已经处于超负荷运作。而CPU负载显示的是在一段时间内CPU正在处理以及等待CPU处理的进程数之和的统计信息，也就是CPU使用队列的长度的统计信息。
+CPU利用率高并不意味着负载就一定大，可能这个任务是一个CPU密集型的。一样CPU低利用率的情况下是否会有高Load Average的情况产生呢？理解占有时间和使用时间就可以知道，当CPU分配时间片以后，是否使用完全取决于使用者，因此完全可能出现低利用率高Load Average的情况。另外IO设备也可能导致CPU负载高。
+由此来看，仅仅从CPU的使用率来判断CPU是否处于一种超负荷的工作状态还是不够的，必须结合Load Average来全局的看CPU的使用情况。网上有个例子来说明两者的区别如下：某公用电话亭，有一个人在打电话，四个人在等待，每人限定使用电话一分钟，若有人一分钟之内没有打完电话，只能挂掉电话去排队，等待下一轮。电话在这里就相当于CPU，而正在或等待打电话的人就相当于任务数。在电话亭使用过程中，肯定会有人打完电话走掉，有人没有打完电话而选择重新排队，更会有新增的人在这儿排队，这个人数的变化就相当于任务数的增减。为了统计平均负载情况，我们5秒钟统计一次人数，并在第1、5、15分钟的时候对统计情况取平均值，从而形成第1、5、15分钟的平均负载。有的人拿起电话就打，一直打完1分钟，而有的人可能前三十秒在找电话号码，或者在犹豫要不要打，后三十秒才真正在打电话。如果把电话看作CPU，人数看作任务，我们就说前一个人（任务）的CPU利用率高，后一个人（任务）的CPU利用率低。当然， CPU并不会在前三十秒工作，后三十秒歇着，CPU是一直在工作。只是说，有的程序涉及到大量的计算，所以CPU利用率就高，而有的程序牵涉到计算的部分很少，CPU利用率自然就低。但无论CPU的利用率是高是低，跟后面有多少任务在排队没有必然关系。
+CPU数量和CPU核心数（即内核数）都会影响到CPU负载，因为任务最终是要分配到CPU核心去处理的。两块CPU要比一块CPU好，双核要比单核好。因此，我们需要记住，除去CPU性能上的差异，CPU负载是基于内核数来计算的，即“有多少内核，即有多少负载”，如单核最好不要超过100%，也就是负载为1.00，如此类推。
+Linux里有一个/proc目录，存放的是当前运行系统的虚拟映射，其中有一个文件为cpuinfo，这个文件里存放着CPU的信息。/proc/cpuinfo文件按逻辑CPU而非真实CPU分段落显示信息，每个逻辑CPU的信息占用一个段落，第一个逻辑CPU标识从0开始。
+
+$ cat /proc/cpuinfo 
+processor       : 0
+vendor_id       : GenuineIntel
+cpu family      : 6
+model           : 63
+model name      : Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz
+stepping        : 2
+microcode       : 0x36
+cpu MHz         : 2399.998
+cache size      : 20480 KB
+physical id     : 0
+siblings        : 2
+core id         : 0
+cpu cores       : 2
+apicid          : 0
+initial apicid  : 0
+fpu             : yes
+fpu_exception   : yes
+cpuid level     : 15
+wp              : yes
+flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr ......
+bogomips        : 4799.99
+clflush size    : 64
+cache_alignment : 64
+address sizes   : 42 bits physical, 48 bits virtual
+power management:
+
+ 要理解该文件中的CPU信息，有几个相关的概念要知道，如：processor表示逻辑CPU的标识、model name表示真实CPU的型号信息、physical id表示真实CPU和标识、cpu cores表示真实CPU的内核数等等。
+逻辑CPU的描述：现在的服务器一般都使用了“超线程”（Hyper-Threading，简称HT）技术来提高CPU的性能。超线程技术是在一颗CPU同时执行多个程序而共同分享一颗CPU内的资源，理论上要像两颗CPU一样在同一时间执行两个线程。虽然采用超线程技术能同时执行两个线程，但它并不象两个真正的CPU那样，每各CPU都具有独立的资源。当两个线程都同时需要某一个资源时，其中一个要暂时停止，并让出资源，直到这些资源闲置后才能继续。因此超线程的性能并不等于两颗CPU的性能。具有超线程技术的CPU还有一些其它方面的限制。
+二、CPU负载率的计算方式
+ Load average的概念源自UNIX系统，虽然各家的公式不尽相同，但都是用于衡量正在使用CPU的进行数量和正在等待CPU的进程数量，一句话就是runable processes的数量。所以Load average可以作为CPU瓶颈的参考指标，如果大于CPU的数量，说明CPU可能不够用了。
+但是，在Linux上有点差异！
+Linux上的load average除了包括正在使用CPU的进程数量和正在等待CPU的进程数量之外，还包括uninterruptible sleep的进程数量。通常等待IO设备、等待网络的时候，进程会处于uninterruptible sleep状态。Linux设计者的逻辑是，uninterruptible sleep应该都是很短暂的，很快就会恢复运行，所以被等同于runnable。然而uninterruptible sleep即使再短暂也是sleep，何况现实世界中uninterruptible sleep未必很短暂，大量的、或长时间的uninterruptible sleep通常意味着IO设备遇到了瓶颈。众所周知，sleep状态的进程是不需要CPU的，即使所有的CPU都空闲，正在sleep的进程也是运行不了的，所以sleep进程的数量绝对不适合用作衡量CPU负载的指标，Linux把uninterruptible sleep进程算进load average的做法直接颠覆了load average的本来意义。所以在Linux系统上，load average这个指标基本失去了作用，因为你不知道它代表什么意思，当看到load average很高的时候，你不知道是runnable进程太多还是uninterruptible sleep进程太多，也就无法判断是CPU不够用还是IO设备有瓶颈。
+从另一个方面来说，也就可以解释为什么磁盘慢时（大量磁盘使用时），CPU负载会飙高了。基本上我碰到CPU负载高的情况就两种情况：CPU本身处理太多任务，再加上软中断和上下文切换太频繁导致负载高；再就是磁盘太慢导致了不可中断睡眠太多导致CPU负载高。
+*** To be more precise, use this command can easily find out which processes are "eating" your CPU cycles (load average= runnable + uninteruptable sleeping)
+#+BEGIN_SRC 
+watch -d -n 1 "(ps aux | awk '\$8 ~ /D/ { print \$0 }')" 
+#+END_SRC
+
+* memory usage 
+** pmap
+pmap -d ${PID} 
+1. writeable/private就是指不含shared memory純脆被process所佔用的實體記憶體空間
+** ps
+1. ps -o pid,%mem,command ax | grep mango
+ 
+* list open file
+#+BEGIN_SRC 
+lsof -p ${pid}
+#+END_SRC
+** find target process  open connection
+#+BEGIN_SRC 
+ lsof -ai -p 44639
+#+END_SRC
+* list folder be used by which process ?
+#+BEGIN_SRC 
+lsof +D  game_hz
+#+END_SRC
+ - ouput simple
+#+BEGIN_SRC 
+COMMAND   PID    USER   FD   TYPE DEVICE SIZE/OFF      NODE NAME
+java    43449 jenkins  cwd    DIR  253,0       79 141476523 game_hz
+java    43449 jenkins    1w   REG  253,0     1176 141486912 game_hz/nohup.out
+java    43449 jenkins    2w   REG  253,0     1176 141486912 game_hz/nohup.out
+java    43449 jenkins    6w   REG  253,0 11232578 412523261 game_hz/logs/hz.log
+java    43449 jenkins    7w   REG  253,0        0 412523890 game_hz/logs/report-api_2019-07-16.log
+java    43449 jenkins   65w   REG  253,0        0 412523232 game_hz/logs/report-api_2019-07-30.log
+#+END_SRC
+
+

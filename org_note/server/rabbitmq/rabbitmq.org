@@ -1,0 +1,67 @@
+* install
+** centos
+ 1. 參考: https://www.rabbitmq.com/which-erlang.html, 尋找自己的os Erlan可用的版本
+ 2. [[http://www.rabbitmq.com/releases/rabbitmq-server/][參考版本]]
+ 3. rpm -ivh http://www.rabbitmq.com/releases/rabbitmq-server/v3.6.0/rabbitmq-server-3.6.0-1.noarch.rpm
+ 4. 如果有少socat, 安裝之: yum install socat
+*** 成功方式
+**** centos
+1. 裝erl source dependence版本(如果os default版本過無法support):
+   download erlang from :
+  : https://bintray.com/rabbitmq-erlang/rpm/erlang/22.1-1
+2. 到package cloud 抓腳本: 
+  : https://packagecloud.io/rabbitmq/rabbitmq-server/install#bash-rpm
+3. yum install rabbitmq-server
+* add user
+#+BEGIN_SRC 
+rabbitmqctl add_user fenrir fenrir
+#+END_SRC
+
+* admin tool
+** 查詢被完成的東西
+sudo rabbitmqctl list_queues ${queue_name} messages_ready messages_unacknowledged
+** purge queue
+1.  sudo rabbitmqctl purge_queue ${queue_name}
+2. 怎麼刪都刪不掉的話： <這個動作會把queue移除, 之後還要在create回來>
+   sudo rabbitmqctl eval '{ok, Q} = rabbit_amqqueue:lookup(rabbit_misc:r(<<"/">>, queue, <<"generatingSummaryReport">>)), rabbit_amqqueue:delete_crashed(Q).'
+   sudo rabbitmqadmin  -V / declare queue  name=generatingSummaryReport 
+** 創建queue
+   1. 安裝rabbitmqadmin from https://www.rabbitmq.com/management-cli.html
+   2. sudo rabbitmqadmin  -V / declare queue  name=generatingSummaryReport 
+** connect 或是連不上的時候, 查用戶permissions
+*** 查詢permission: rabbitmqctl list_permissions
+*** 設置permission: rabbitmqctl set_permissions -p / fenrir  ".*" ".*" ".*"
+   
+** heartbeats
+- Detecting Dead TCP Connections with Heartbeats and TCP Keepalives
+https://www.rabbitmq.com/heartbeats.html
+
+** rabbitmqadmin
+*** 使用需求環境
+他是http server, 所以要先開啟rabbitmq http server,
+#+BEGIN_SRC 
+ rabbitmq-plugins enable rabbitmq_management
+#+END_SRC
+*** 官方文件
+#+NAME: web document
+| a        | table                                        |
+|----------+----------------------------------------------|
+| 官方文件 | https://www.rabbitmq.com/management-cli.html |
+|          |                                              |
+|          |                                              |
+|          |                                              |
+|          |                                              |
+
+* isuuse handle 
+** #method(reply-code=541, reply-text=INTERNAL_ERROR - access to vhost '/' refused for user 'root': vhost '/' is down, class-id=10, method-id=40) 
+ Caused by: com.rabbitmq.client.ShutdownSignalException: connection error; protocol method:
+rabbitmqctl stop_app
+rabbitmqctl reset
+rabbitmqctl start_app
+** connection reset
+1. 因為換了機器, hostname變更, 倒置rabbitmq無法連上線
+* monitor
+** list exchane message received
+** 可以看見excahnge有沒有收到,有收到訊息,  recv_cnt會增加
+rabbitmqctl list_connections  name host channels vhost send_pend connected_at state peer_host user recv_cnt 
+

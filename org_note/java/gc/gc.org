@@ -1,0 +1,8 @@
+* 記憶體管理
+1. [[file:memory_manager/main.org][Java Memory Management]]
+* gc
+** serail gc
+ - 技術: sliding compacting mark-swap
+ - 場合： client程式
+   one thread處理gc, 當client 數目多於cpu數目, gc執行比較不會影響電腦效能
+

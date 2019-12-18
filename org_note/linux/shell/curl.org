@@ -1,0 +1,53 @@
+* test cros
+#+BEGIN_SRC 
+curl -H 'Content-Type: application/json' -H 'Access-Control-Request-Method: POST' -H 'Origin: 127.0.0.1:8080' --head  -s -XPOST     --verbose 127.0.0.1:6969/pp/user/create
+#+END_SRC
+觀察 <開頭, 看伺服器有將cross response送給你
+#+BEGIN_SRC 
+127.0.0.1:6969/pp/user/create
+*   Trying 127.0.0.1...
+* Connected to 127.0.0.1 (127.0.0.1) port 6969 (#0)
+  > POST /pp/user/create HTTP/1.1
+  > Host: 127.0.0.1:6969
+  > User-Agent: curl/7.47.0
+  > Accept: */*
+  > Content-Type: application/json
+  > Access-Control-Request-Method: POST
+  > Origin: 127.0.0.1:8080
+  > 
+  < HTTP/1.1 400 
+  HTTP/1.1 400 
+  < Vary: Origin
+  Vary: Origin
+  < Vary: Access-Control-Request-Method
+  Vary: Access-Control-Request-Method
+  < Vary: Access-Control-Request-Headers
+  Vary: Access-Control-Request-Headers
+  < Access-Control-Allow-Origin: 127.0.0.1:8080 //server回應了可以用的清單,如果你不再清單內, 他不會show給你
+  Access-Control-Allow-Origin: 127.0.0.1:8080
+  < X-Content-Type-Options: nosniff
+  X-Content-Type-Options: nosniff
+  < X-XSS-Protection: 1; mode=block
+  X-XSS-Protection: 1; mode=block
+  < Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+  Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+  < Pragma: no-cache
+  Pragma: no-cache
+  < Expires: 0
+  Expires: 0
+  < X-Frame-Options: DENY
+  X-Frame-Options: DENY
+  < Content-Type: application/json;charset=UTF-8
+  Content-Type: application/json;charset=UTF-8
+  < Transfer-Encoding: chunked
+  Transfer-Encoding: chunked
+  < Date: Tue, 15 Jan 2019 04:25:31 GMT
+  Date: Tue, 15 Jan 2019 04:25:31 GMT
+  < Connection: close
+  Connection: close
+
+
+#+END_SRC
+* test websocket
+ curl -i -N -H "Connection: Upgrade" -H "Upgrade: websocket" -H "Host: echo.websocket.org" -H "Origin: http:/127.0.0.1:28080/BlueBox/websocket" http://127.0.0.1:28080/BlueBox/websocket
+

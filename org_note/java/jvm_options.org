@@ -1,0 +1,84 @@
+* jv
+m option 格式
+- boolean 直表示
+  -xx:+AggressiveOpts => 表示true
+  -xx:-AggressiveOpts => 表示 false
+* gc 相關
+** 觀看gc
+[[https://docs.oracle.com/javase/1.5.0/docs/tooldocs/share/jstat.html#gc_option][jstate document]]
+jstat -gc $pid 
+----------------------------------------------------
+Garbage-collected heap statistics
+column  Description
+S0C	Current survivor space 0 capacity (KB).
+S1C	Current survivor space 1 capacity (KB).
+S0U	Survivor space 0 utilization (KB).
+S1U	Survivor space 1 utilization (KB).
+EC	Current eden space capacity (KB).
+EU	Eden space utilization (KB).
+OC	Current old space capacity (KB).
+OU	Old space utilization (KB).
+PC	Current permanent space capacity (KB).
+PU	Permanent space utilization (KB).
+YGC	Number of young generation GC Events.
+YGCT	Young generation garbage collection time.
+FGC	Number of full GC events.
+FGCT	Full garbage collection time.
+GCT	Total garbage collection time.
+
+** jvm argument 敘述
+1. [[http://www.oracle.com/technetwork/articles/java/vmoptions-jsp-140102.html][Java HotSpot VM Options (不包含java 8) (Oracle artical)]]
+2. [[https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html#BABHDABI][java argument document]]
+** java 8 設定經驗
+*** -Xms5m
+初始memory 
+*** -Xmx5m
+最大heap size
+*** -XX:+UseG1GC -XX:MaxMetaspaceSize=15m
+java 8才有, java 8移除了maxPermSize
+ - [[http://openjdk.java.net/jeps/122][see JEP122 ]]
+
+** runtime gc log
+-XX:+PrintGCDetails
+-Xloggc:/var/log/mango/games/gc.log
+-XX:+PrintGCTimeStamps
+
+* 效能優化
+** 64bit優化
+- 原因
+   64bit指標( ordinary object pointers) 大小較長 -> 影響cpu快取數量, 能快取的數量變少
+   -> 造成register spilling -> 效能會減少8-15%, 比起32bit
+- 將oops做壓縮成32bit, 使用指令
+#+BEGIN_SRC 
+-XX:UseCompressedOops
+#+END_SRC
+
+* lock 優化
+** 偏向鎖baised lock
+* vm shutdowm error
+** -xx:ShowMessageBoxOnError 
+when vm shutdown, show a dialoag, 讓你可以attach debug
+** -XX:OnError=cmd1 arg1 arg2
+when vm shutdown, executing cmd1...
+在linux通常用dbx
+** -XX:HeapDumpPath=/xx/xxx
+將hs_erro_pid.log 寫到path/xx/xxxx
+hot spot vm的縮寫
+
+* jit 
+** -XX"+PrintCompilation show jit compie info 
+* 設定default語系
+-Duser.language=en-US                                                                                                               
+** 之前遇到的問題:
+log4j 用mmm會根據jvm language選擇月用default user locale呈現, 當時出現一開始是英文
+在某一段時間過後變成中文, 因此強制設定使用語系解決此問題
+
+* enable jmx
+-Dcom.sun.management.jmxremote
+-Dcom.sun.management.jmxremote.port=9010
+-Dcom.sun.management.jmxremote.authenticate=false
+-Dcom.sun.management.jmxremote.ssl=false
+* memory
+** directive memory
+-XX:MaxDirectMemorySize=256M
+

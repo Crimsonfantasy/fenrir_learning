@@ -1,0 +1,2 @@
+* what is snap (snapcraft)?
+** The app store for Linux Publish your app for Linux usersfor desktop, cloud, and Internet of Things.

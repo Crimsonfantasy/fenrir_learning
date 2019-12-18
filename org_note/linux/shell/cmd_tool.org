@@ -1,0 +1,13 @@
+* http client
+** rest
+*** httpie
+**** install
+debian:
+sudo apt-get install httpie
+**** use
+ 1. http GET 127.0.0.1:8182/trace/xx
+**** basic auth
+http -a  slot_admin:slot_admin  127.0.0.1:26967/stream_slot_mng/mng/server/config
+**** Digest auth
+http -A digest -a username:password example.org
+

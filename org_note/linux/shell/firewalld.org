@@ -1,0 +1,17 @@
+*  加port
+ sudo firewall-cmd --add-port=8080/tcp --permanent
+ --permanent 永久有效
+* rich rule
+** 加特定ip, 特定port
+firewall-cmd --permanent --remove-rich-rule='rule family="ipv4" source address="192.168.22.32" port port="1883" protocol="tcp" accept'
+* reload
+sudo firewall-cmd --reload
+* 限制client連上某個ip
+** 沒用, 別嘗試了 bollock
+firewall-cmd  --remove-rich-rule='rule family="ipv4" destination address="192.168.22.32/32"  drop'
+** 可行
+   firewall-cmd --direct --remove-rule ipv4 filter OUTPUT 0 -d 192.168.22.32/32 -p tcp -m tcp --dport=1883 -j DROP
+ 1. filter OUTPUT 0 (不清楚)
+ 2. --dport= destination port
+ 3. -d destonation ip
+

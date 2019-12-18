@@ -1,0 +1,211 @@
+* show table size
+ -- Tables + Size MB
+ select owner, table_name, round((num_rows*avg_row_len)/(1024*1024)) MB 
+ from all_tables 
+ where owner not like 'SYS%'  -- Exclude system tables.
+ and num_rows > 0  -- Ignore empty Tables.
+ order by MB desc -- Biggest first.
+ ;
+* data relative query
+** SELECT TO_CHAR(sysdate, 'YYYY/MM/DD') FROM dual;
+** 取得星期幾
+Sunday=1, Monday=2, ...
+SQL> SELECT TO_CHAR(sysdate, 'D') FROM dual;
+** DDD 一年的第幾天
+SELECT TO_CHAR(sysdate, 'DDD') FROM dual;
+** WW 一年的第幾週
+SELECT TO_CHAR(sysdate, 'WW') FROM dual;
+** 一月的第幾週
+ SELECT TO_CHAR(sysdate, 'W') FROM dual;
+** 24 DATE TIME
+6. YYYY/MM/DD HH24:MI:SS AM
+SQL> SELECT TO_CHAR(sysdate, 'YYYY/MM/DD HH24:MI:SS AM') FROM dual;
+YYYY 年
+MM 月份
+DD 日期
+HH24/HH HH24表採24小時制
+MI 分鐘
+SS 秒數
+AM/PM 顯示上/下午
+** 排序多個table
+*** 用Union
+*** 效果比union好的full outer join
+#+BEGIN_SRC 
+select COALESCE(b.gt, sbr.gt, rbr.gt) gt, coalesce(b.ct, sbr.ct, rbr.ct) ct, coalesce(b.USER_ID, sbr.USER_ID, rbr.USER_ID) userId,
+       COALESCE(b.BET_RESULT_ID, sbr.BET_RESULT_ID, rbr.BET_RESULT_ID)
+from (select 'bull2' gt, s.BET_RESULT_ID, s.CREATED_TIME ct, s.GOT_TOTAL_CASH s_cash, s.USER_ID
+      from Bull2_BET_RESULT s) b full
+       outer join (select 'sicBo'          gt,
+                          s.BET_RESULT_ID,
+                          s.CREATED_TIME   ct,
+                          s.GOT_TOTAL_CASH s_cash,
+                          s.USER_ID,
+                          s.BANKER_RESULT
+                   from SICBO_BET_RESULT s) sbr on (b.ct = sbr.ct) full
+       outer join (select 'roulette'       gt,
+                          s.BET_RESULT_ID,
+                          s.CREATED_TIME   ct,
+                          s.GOT_TOTAL_CASH r_cash,
+                          s.USER_ID,
+                          s.BANKER_RESULT
+                   from ROULETTE_BET_RESULT s) rbr on (sbr.ct = rbr.ct)
+order by ct desc;
+#+END_SRC
+result like below:
+
+sicBo,2018-08-10 15:53:34.948000,nobugplz@MKT,63d1b0c5-8297-45f8-abc8-ab7d789dfae9
+sicBo,2018-08-10 15:52:37.246000,mktpl100@MKT,ba49efdf-bbd1-4279-a488-e43097ad6c38
+sicBo,2018-08-10 15:52:37.242000,nobugplz@MKT,851e8078-1a93-4437-a9e5-3d87f660e4a9
+roulette,2018-08-10 15:52:24.082000,nobugplz@MKT,99b1f1ab-7399-4500-b3a1-2d7a41a8fcca
+sicBo,2018-08-10 15:51:39.412000,mktpl100@MKT,3e85a605-c93b-4659-a4aa-955752b958f2
+sicBo,2018-08-10 15:50:41.630000,monkeywu38@MKT,8e38f88e-7266-437a-919b-743d77c29689
+
+
+
+* sql cursor template
+#+BEGIN_SRC 
+DECLARE
+  difference         INTEGER;
+  sqlstmt            VARCHAR2(255) ;
+  sqlstmt2           VARCHAR2(255) ;
+  sqlstmt3           VARCHAR2(255) ;
+  sequenceValue      NUMBER;
+  sequencename       VARCHAR2(30) ;
+  sequencelastnumber INTEGER;
+  CURSOR allseq
+  IS
+    SELECT sequence_name, last_number FROM user_sequences ORDER BY sequence_name;
+BEGIN
+  DBMS_OUTPUT.enable(32000) ;
+  OPEN allseq;
+  LOOP
+    FETCH allseq INTO sequencename, sequencelastnumber;
+    EXIT
+    WHEN allseq%NOTFOUND;
+    sqlstmt  := 'ALTER SEQUENCE ' || sequencename || ' INCREMENT BY ';
+    --Assuming: <tablename>_id is <sequencename>
+    sqlstmt2 := 'select (nvl(Max(ID),0) - :1)+1 from ' || sequencename;
+    DBMS_OUTPUT.PUT_LINE(sqlstmt2);
+    --Attention: makes use of user_sequences.last_number --> possible cache problems!
+    -- sequence_name map to :1 in statement sqlstmt2
+    EXECUTE IMMEDIATE sqlstmt2 INTO difference USING sequencelastnumber;
+    DBMS_OUTPUT.PUT_LINE('difference' || difference) ;
+    END IF;
+  END LOOP;
+  CLOSE allseq;
+END;
+#+END_SRC
+* show client  connected to DB
+需要dba權限
+SELECT * from v$session v where v.schemaname = 'JBGAME'; 
+* change password
+1. alter user jbgame identified by new_password;
+   密碼過期, 或更改密碼可用這招
+
+* install sqlplus
+1. sudo apt-get install libaio1 libaio-dev
+2. edit ~/.bashrc
+#+BEGIN_SRC 
+export ORACLE_HOME=/home/jumbo/server/sqlplus/instantclient_12_2
+export LD_LIBRARY_PATH=$ORACLE_HOME
+export PATH=$PATH:$ORACLE_HOME
+#+END_SRC
+3.
+link: http://www.oracle.com/technetwork/topics/linuxx86-64soft-092277.html
+download:
+instantclient-basic-linux.x64-11.2.0.3.0.zip
+instantclient-sqlplus-linux.x64-11.2.0.3.0.zip
+instantclient-sdk-linux.x64-11.2.0.3.0.zip
+4. sqlplus login example 
+#+BEGIN_SRC 
+sqlplus jbgame/jbgame@192.168.18.111:49161/XE
+#+END_SRC
+
+* use sqlplus 
+example:
+#+BEGIN_SRC 
+#!/bin/bash                                                                                                                                              
+#crontab requires head                                                                                                                                   
+#cron tab do not record aby system env, so i need to set by it myself                                                                                    
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/jumbo/server/sqlplus/instantclient_12_2:/home/jumbo/server/sql_shell             
+export ORACLE_HOME=/home/jumbo/server/sqlplus/instantclient_12_2                                                                                         
+export LD_LIBRARY_PATH=$ORACLE_HOME                                                                                                                      
+export PATH=$PATH:$ORACLE_HOME                                                                                                                           
+                                                                                                                                                         
+out=`sqlplus -s jbgame/jbgame@192.168.18.111:49161/XE <<EOF                                                                                              
+ set heading off feedback off verify off                                                                                                                 
+ DELETE from BROADCASTBOARD where READ_FLAG = 1;                                                                                                         
+ select count(*) from BROADCASTBOARD;                                                                                                                    
+       exit                                                                                                                                              
+EOF                                                                                                                                                      
+`                                                                                                                                                        
+echo $out >> /home/jumbo/server/sql_shell/sql_exec.log     
+#+END_SRC
+* -- Query --
+** application query
+*** query by time condition
+select * from BAGAMECONFIRM where UID_A = 'kbmkpl10@KB' and CREATETIME > to_timestamp('20-04-2018 14:45:00', 'dd-mm-yyyy hh24:mi:ss');
+*** query and limit row num
+select * from BA_GAME_RESULT_SERVER where ROWNUM =1;
+** System
+*** show instance nam (SID)
+- login with sys
+- select instance_name from v$instance
+*** query many process db can used
+  - login with sys
+  - select * from v$parameter where name='processes';
+  - select * from V$RESOURCE_LIMIT where resource_name='processes';
+**** modified reource_limit
+  - alter system set processes=300 scope=spfile; commit;
+
+* JSON
+** store machone
+Data Types for JSON Columns
+You can store JSON data in Oracle Database using columns whose data types are VARCHAR2, CLOB, or BLOB. The choice of which to use is typically motivated by the size of the JSON documents you need to manage:
+- Use VARCHAR2(4000) if you are sure that your largest JSON documents do not exceed 4000 bytes (or characters)Foot 1Footref .
+ If you use Oracle Exadata then choosing VARCHAR2(4000) can improve performance by allowing the execution of some JSON operations to be pushed down to Exadata storage cells, for improved performance.
+- Use VARCHAR2(32767) if you know that some of your JSON documents are larger than 4000 bytes (or characters) and you are sure than none of the documents exceeds 32767 bytes (or characters)Footref .
+ With VARCHAR2(32767), the first roughly 3.5K bytes (or characters) of a document is stored in line, as part of the table row. This means that the added cost of using VARCHAR2(32767) instead of VARCHAR2(4000) applies only to those documents that are larger than about 3.5K. If most of your documents are smaller than this then you will likely notice little performance difference from using VARCHAR2(4000).
+ If you use Oracle Exadata then push-down is enabled for any documents that are stored in line.
+- Use BLOB (binary large object) or CLOB (character large object) storage if you know that you have some JSON documents that are larger than 32767 bytes (or characters)Footref .
+* performance
+- 10萬比數
+ 1. 第一次
+  [2018-05-09 16:12:07] completed in 2ms
+  sql> select * from REPORT_GAME_SUMMARY where  UID_A = 'user-368'
+ 2. 第2次 
+  [2018-05-09 16:12:07] 1 row retrieved starting from 1 in 228ms (execution: 30ms, fetching: 198ms)
+  sql> select * from REPORT_GAME_SUMMARY where  UID_A = 'user-368'
+  [2018-05-09 16:12:32] 1 row retrieved starting from 1 in 66ms (execution: 17ms, fetching: 49ms)
+- 60萬比數
+ 1. 第一次
+  sql> select * from REPORT_GAME_SUMMARY where  UID_A = 'user-368'
+  [2018-05-09 16:15:17] 1 row retrieved starting from 1 in 274ms (execution: 217ms, fetching: 57ms)
+ 2. 第二次
+  sql> select * from REPORT_GAME_SUMMARY where  UID_A = 'user-368'
+  [2018-05-09 16:15:30] 1 row retrieved starting from 1 in 82ms (execution: 27ms, fetching: 55ms)
+
+* administrator
+ - default system user => system/oracle
+* ORA PROBLEM
+** ORA-02266:
+i want truncate but issuing foreign key constraint.
+solutions:
+ alter table BULL2_BET_RESULT disable primary key cascade;
+
+* tablespace
+** find default tablespace
+#+BEGIN_SRC 
+SELECT PROPERTY_VALUE FROM DATABASE_PROPERTIES WHERE PROPERTY_NAME = 'DEFAULT_PERMANENT_TABLESPACE';
+#+END_SRC
+
+* patition
+** table table be partitioned
+   SELECT * FROM ALL_TAB_PARTITIONS;
+* index
+** create index no lock, key word: online
+   create index JBGAME.CASINO_GAME_H_ID on JBGAME.CASINO_GAME_HISTORY (ID)  online;
+** create index on no patition table
+   create index JBGAME.CASINO_GAME_H_ID on JBGAME.CASINO_GAME_HISTORY (ID) online ;
+** create index on  patition table
+   create index JBGAME.CASINO_GAME_H_ID on JBGAME.CASINO_GAME_HISTORY (ID) local online ;

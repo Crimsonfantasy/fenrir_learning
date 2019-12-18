@@ -1,0 +1,4 @@
+* apt-get 
+** apt-get 403 forbiden
+編輯 /etc/apt/sources.list 
+裡面的repository有的是壞的, 我當時的作法是找default config file貼上去

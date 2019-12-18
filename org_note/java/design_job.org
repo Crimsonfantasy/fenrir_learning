@@ -1,0 +1,9 @@
+* deployee multi instancs but our scheduled tasks run only once at the same time
+**  user spring shedLock
+ + link: [[https://www.baeldung.com/shedlock-spring][shedLock example]]
+ + shedLock: [[https://github.com/lukas-krecan/ShedLock][sheldLock source]]
+  : ShedLock does one and only one thing.
+  : It makes sure your scheduled tasks are executed at most once at the same time.
+  : If a task is being executed on one node, it acquires a lock which prevents execution of
+  : the same task from another node (or thread). Please note, that if one task is already being executed 
+  : on one node, execution on other nodes does not wait, it is simply skipped.

@@ -1,0 +1,18 @@
+* interchage two column
+ - source file
+#+BEGIN_SRC 
+aaa,bbbb
+ccc,dddd
+aaa,bbbb
+ccc,dddd
+aaa,bbbb
+ccc,dddd
+aaa,bbbb
+ccc,dddd
+#+END_SRC
+ - 先指定,當delimiter
+ - 然後用print $2 (指定column 2), $1 (指定column 1)
+#+BEGIN_SRC 
+awk 'BEGIN { FS = "," };{ print $2 "," $1}'  ${file_name}
+#+END_SRC 
+
