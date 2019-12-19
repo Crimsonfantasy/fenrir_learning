@@ -13,7 +13,7 @@ When reboot, /etc/resolv.conf setting are changed as:
    /etc/sysconfig/network-scripts/ifcfg-ppp0:PEERDNS=no
    /etc/sysconfig/network-scripts/ifcfg-ppp0.bak:PEERDNS=yes
  #+END_SRC
-**** modify /etc/sysconfig/network-scripts/ifcfg-ppp0
+**** create /etc/sysconfig/network-scripts/ifcfg-default-dhcp
  copy setting into /etc/sysconfig/network-scripts/ifcfg-default-dhcp, these arguments are
  Pppoe can not work on boot time, we use another setting :ifcfg-default-dhcp to overrid /etc/resolv.conf
  - PEERDNS=answer
@@ -50,3 +50,21 @@ sudo reboot
 #+END_SRC
 *** reference:
 [[https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/deployment_guide/s1-networkscripts-interfaces][redhet's interface configuration files]]
+* auto adsl when booting!
+I have try systemctl, but pppoe-start is a process that start and end quickly.
+Service should be  a long running process. Therefore, I used crontab to triiger
+cmd, pppoe-start, at boot time
+** edit crontable
+#+BEGIN_SRC shell
+  sudo crontab -e
+#+END_SRC
+** add reboot command
+#+BEGIN_SRC shell
+  @reboot sh /home/fenrir/Documents/auto-adsl.sh
+#+END_SRC
+** here is my auto-adsl.sh:
+#+BEGIN_SRC shell
+  #!/usr/bin/env bash
+  sudo /usr/sbin/pppoe-start
+#+END_SRC
+
