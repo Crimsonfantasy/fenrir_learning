@@ -1,0 +1,14 @@
+* export
+什麼是『子程序』呢？就是說，在我目前這個 shell 的情況下，去啟用另一個新的 shell ，
+新的那個 shell 就是子程序啦！在一般的狀態下，
+父程序的自訂變數是無法在子程序內使用的。
+但是透過 export 將變數變成環境變數後，
+就能夠在子程序底下應用了！很不賴吧！至於程序的相關概念
+#+BEGIN_SRC 
+[fenrir@localhost Downloads]$ export ${WINEARCH}
+[fenrir@localhost Downloads]$ 
+[fenrir@localhost Downloads]$ 
+[fenrir@localhost Downloads]$ bash
+[fenrir@localhost Downloads]$ echo $WINEARCH
+win64
+#+END_SRC

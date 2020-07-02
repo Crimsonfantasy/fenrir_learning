@@ -1,0 +1,12 @@
+* To add a single directory                                      
+  (e.g., "~/.emacs.d/lisp/") to the front of your ‘load-path’:
+#+BEGIN_SRC lisp
+(add-to-list 'load-path "~/.emacs.d/lisp/")
+#+END_SRC
+** for example, 宣告使用module (combo use)
+#+BEGIN_EXAMPLE lisp
+(add-to-list 'load-path "~/.emacs.d/evernote/")
+(setq evernote-developer-token "")
+(require 'evernote-mode)
+#+END_EXAMPLE
+

@@ -1,0 +1,6 @@
+
+* gnome-shell error log
+#+BEGIN_SRC shell
+ journalctl /usr/bin/gnome-shell
+ journalctl /usr/bin/gnome-session
+#+END_SRC

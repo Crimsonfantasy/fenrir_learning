@@ -1,0 +1,15 @@
+#    -*- mode: org -*-
+
+
+Archived entries from file /home/fenrir/work/fenrir_learning/org_note/python/selenium/issues.org
+
+
+* Message: element click intercepted:
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2020-07-01 Wed 11:01
+  :ARCHIVE_FILE: ~/work/fenrir_learning/org_note/python/selenium/issues.org
+  :ARCHIVE_CATEGORY: issues
+  :END:
+
+  #+include: "~/.emacs" src emacs-lisp
+  

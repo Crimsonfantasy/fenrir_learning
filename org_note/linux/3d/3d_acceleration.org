@@ -1,0 +1,3 @@
+* diagnose problem with your 3d acceleration!
+**  glxinfo
+

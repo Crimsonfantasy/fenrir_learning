@@ -1,5 +1,6 @@
-* How to install the NVIDIA drivers ? 
+* How to install the NVIDIA drivers ?                                :nvidia:
 ** on Fedora 31 Workstation step by step instructions
+
 #+BEGIN_SRC shell
   lspci -vnn | grep VGA
 #+END_SRC
@@ -23,3 +24,5 @@
 #+BEGIN_SRC shell
   reboot
 #+END_SRC
+** on Fedora 32:
+use installer from  github: [[https://github.com/t0xic0der/nvidia-auto-installer-for-fedora][nvidia-auto-installer-for-fedora]]

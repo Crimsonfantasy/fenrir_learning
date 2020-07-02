@@ -1,0 +1,4 @@
+* terminal theme
+** gnome terminal theme
+*** Dracula:
+require Gname `dconf` tool, and the [[https://draculatheme.com/gnome-terminal][Dracula theme template]]

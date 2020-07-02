@@ -1,0 +1,17 @@
+* template string
+** string subtitute
+#+BEGIN_SRC python
+from string import Template
+text = 'world'
+t = Template('hello, $text')
+t.substitute(text=text)
+# hello, world
+#+END_SRC
+** hex substitiude
+#+BEGIN_SRC python
+from string import Template
+number = 23
+t = Template('hello, $number')
+t.substitute(number=hex(number))
+# hello, 0x17
+#+END_SRC

@@ -1,0 +1,4 @@
+*  exclamation mark 驚歎號 (!) in C:                            :exclamation:
+According to the C99 standard :
+The result of the logical negation operator ! is 0 if the value of its operand compares unequal to 0, 1 
+if the value of its operand compares equal to 0. The result has type int. The expression !E is equivalent to (0==E).

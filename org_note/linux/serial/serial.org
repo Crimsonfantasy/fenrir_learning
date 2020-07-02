@@ -1,0 +1,6 @@
+* 一般用戶無法訪問serial port?
+把使用者加入dialout羣組
+#+BEGIN_SRC shell
+sudo usermod -aG dialout fenrir
+#+END_SRC
+

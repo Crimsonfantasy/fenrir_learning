@@ -1,0 +1,4 @@
+* 驗證osgi bundle 是否正確?
+#+BEGIN_SRC shell
+bnd print --verify osgi_camera_swing_panel_bundle-1.0.0.jar 
+#+END_SRC

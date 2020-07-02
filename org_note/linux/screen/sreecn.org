@@ -1,0 +1,5 @@
+* query screen input whether is connected? 查詢各個螢幕的連接點是否有接上裝置？
+#+BEGIN_SRC 
+  xrandr --query
+#+END_SRC
+

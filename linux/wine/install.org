@@ -1,0 +1,4 @@
+* wine chinese lang when install
+#+BEGIN_SRC  shell
+    env LANG=zh_CN.UTF-8 wine example.exe
+#+END_SRC

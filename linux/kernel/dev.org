@@ -1,0 +1,10 @@
+* 如何開發driver:
+** in linux or windows
+There are two types of driver that is kernel mode or user mode.
+*** kernel mode driver
+*** user mode driver
+*** how to control extenal device?
+- in linux or windows
+ 他們都用虛擬檔案系統, 把外部裝置當作檔案來操作
+- in OSX
+ 有deviceManager的api讓你來用

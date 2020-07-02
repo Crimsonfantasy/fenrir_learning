@@ -1,0 +1,44 @@
+* 必備知識
+** sudo winetricks vcrun2015
+   安裝vistual studio c++ 2015
+   fix these problem
+   #+BEGIN_SRC 
+ 0009:fixme:toolhelp:CreateToolhelp32Snapshot Unimplemented: heap list snapshot
+ 0009:fixme:toolhelp:CreateToolhelp32Snapshot Unimplemented: heap list snapshot
+ 0009:fixme:toolhelp:CreateToolhelp32Snapshot Unimplemented: heap list snapshot
+ 0009:fixme:ver:GetCurrentPackageId (0x33f584 (nil)): stub
+ 002a:fixme:toolhelp:CreateToolhelp32Snapshot Unimplemented: heap list snapshot
+ 0009:fixme:toolhelp:CreateToolhelp32Snapshot Unimplemented: heap list snapshot
+
+   #+END_SRC
+** 選擇安裝環境  
+   wine會模擬c槽的資料夾結構 像是 Program File, windows 之類的在c曹能看到的樹狀結構
+   1. 準備64bit設定環境於~/.my64Prefix
+   #+BEGIN_SRC 
+   WINEPREFIX=~/.my64Prefix  winecfg
+   #+END_SRC
+   2. exam[ple: 使用64bit環境安裝54 bin line app, 設定語系是中文
+   #+BEGIN_SRC 
+ env LANG=zh_CN.UTF-8  WINEPREFIX=/home/fenrir/.my64Prefix/   wine64   ./LineInst.exe 
+   #+END_SRC
+
+** use target wine architecture
+   使用wine 64bit architecture的指令   
+#+BEGIN_SRC 
+ WINEARCH=win64 
+   #+END_SRC
+
+
+
+* 成功安裝方式 (2020/06 line可以在32bits wine architeture上跑)
+** wineboot
+** winetricks vcrun2015
+** wine ./LineInst.exe 
+
+* WINEDEBUG=-all , 減少看到的訊息
+* declare -x  WINEPREFIX=/home/fenrir/.wine 用絕對路徑指定wine的環境資料夾
+* declare -x  WINEARCH=win64
+* winetricks atmlib corefonts gdiplus msxml3 msxml6 vcrun2008 vcrun2010 vcrun2012 fontsmooth-rgb gecko
+* winetricks dotnet40 corefonts
+安裝dot net 4.0
+
