@@ -1,0 +1,24 @@
+* 在org mode下執行source程式  :literate Programming:
+** setting
+#+BEGIN_SRC lisp
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '(
+   (python . t)
+   (shell . t)
+   ;; Include other languages here...
+   ))
+;; Syntax highlight in #+BEGIN_SRC blocks
+(setq org-src-fontify-natively t)
+;; Don't prompt before running code in org
+(setq org-confirm-babel-evaluate nil)
+
+#+END_SRC
+** eaxmple
+Try to  run *C-c C-c* while the cursor is inside the source block.
+#+BEGIN_SRC python  :results output
+print("hello world");
+#+END_SRC
+#+RESULTS:
+: hello world
+

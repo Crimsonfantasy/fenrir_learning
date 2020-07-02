@@ -1,0 +1,13 @@
+* problem snapshot
+  At linux (I had this issue at fedora 32)
+  #+CAPTION: 開啟vm出現no 3D suppoert is avaliable from the host 
+  [[file:imgs/vm_3d_issue_graphic_problem.png][problem snapshot]]
+* FIX:
+** check whether hardware Accelerate 3D graphic is enaled?
+   #+CAPTION: check hardware whether 3D Graohics(Accelerate 3D graphic) is enable:
+[[file:imgs/vm_graphic_checked.png][in the preference...]]
+** edit file:  ~/.vmware/preferences
+#+BEGIN_SRC propertiz
+mks.gl.allowBlacklistedDrivers = "TRUE"
+#+END_SRC
+** reboot vm

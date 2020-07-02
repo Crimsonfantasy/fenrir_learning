@@ -1,0 +1,6 @@
+* strace 
+ trace system calls and signals 
+** trace given running process
+#+BEGIN_SRC shell
+strace -p $PID
+#+END_SRC

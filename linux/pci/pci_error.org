@@ -1,0 +1,28 @@
+* I have Fedora32 on a dual boot with Windows 10. 
+  I noticed some time ago that my kern.log file was getting pretty big (10GB or more) so I decided to check it. The same error seems to be repeating every second or less:
+#+BEGIN_SRC 
+Dec 19 17:31:01 andrew kernel: [   99.027473] pcieport 0000:00:1c.5: PCIe Bus Error: severity=Corrected, type=Physical Layer, id=00e5(Receiver ID)
+Dec 19 17:31:01 andrew kernel: [   99.027474] pcieport 0000:00:1c.5:   device [8086:9d15] error status/mask=00000001/00002000
+Dec 19 17:31:01 andrew kernel: [   99.027475] pcieport 0000:00:1c.5:    [ 0] Receiver Error        
+Dec 19 17:31:01 andrew kernel: [   99.027479] pcieport 0000:00:1c.5: AER: Corrected error received: id=00e5
+Dec 19 17:31:01 andrew kernel: [   99.027826] pcieport 0000:00:1c.5: can't find device of ID00e5
+Dec 19 17:31:01 andrew kernel: [   99.027887] pcieport 0000:00:1c.5: AER: Multiple Corrected error received: id=00e5
+
+#+END_SRC
+I have tried adding to the grub pci=nomsi and pci=noaer but it keeps popping up. I am using a HP Laptop with an Nvidia Geforce 920M. Maybe that's the reason?
+
+* 問題可能原因：
+
+I believe this may be due to PCIe Active State Power Management that is transitioning the link to a lower power state and maybe causing the device to trigger these errors. I believe the device in question is the Sunrise Point-LP PCI Express Root Port.
+Try using the pcie_aspm=off boot parameter to see if this stops the messages. Note that this will increase the power consumption of your machine as it disables the power savings.
+
+ 1. sudo -H gedit /etc/default/grub
+ 2. add  *splash pcie_aspm=off* after *quiet*
+#+BEGIN_SRC 
+GRUB_CMDLINE_LINUX="rd.driver.blacklist=nouveau modprobe.blacklist=nouveau nvidia-drm.modeset=1 resume=/dev/mapper/fedora_localhost--live-swap rd.lvm.lv=fedora_localhost-live/root rd.lvm.lv=fedora_localhost-live/swap 
+ rhgb quiet splash pcie_aspm=off"
+#+END_SRC
+ 3. reboot, 查看有沒有一樣問題在發生
+#+BEGIN_SRC 
+jounalctl -e 
+#+END_SRC

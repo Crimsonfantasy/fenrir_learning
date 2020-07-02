@@ -2,3 +2,9 @@
  - free -h ( byte-format of output: -h, -k, -m, -g)
  - cat /proc/meminfo |grep MemTotal
  - vmstat -s
+* chech for errors in Ram ?
+** memtester
+   This should allocate 1024MB of memory, and repeat the test 5 times. 
+#+BEGIN_SRC shell
+sudo memtester 1024 5
+#+END_SRC

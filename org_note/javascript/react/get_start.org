@@ -1,0 +1,41 @@
+* create react app
+** use template from Git (最基本的專案)
+- basic usage
+  https://github.com/facebook/create-react-app
+- more power template
+  https://github.com/react-boilerplate/react-boilerplate
+-
+**  react + typescript (2020/07)
+#+BEGIN_SRC shell
+# Creates an app called my-app
+npx create-react-app rpa_admin  --template typescript
+cd my-app
+
+# Adds the type definitions
+npm install --save typescript @types/node @types/react @types/react-dom @types/jest
+
+npm start
+echo "Good to go :tada:"
+#+END_SRC
+see at [[https://create-react-app.dev/docs/adding-typescript/][facebook tutorial]]
+
+* ESlint for flycheck configuration (如果flycheck沒有作用)
+** 檢查flycheck設定正確嗎？
+#+BEGIN_SRC lisp
+flycheck-verify-setup
+#+END_SRC
+** 安裝npm檢查工具
+Find and fix problems in your JavaScript code
+***  install JS 檢查工具, 我用Eslint ()2020年紀錄
+#+BEGIN_SRC shell
+npm install eslint --save-dev
+#+END_SRC
+or
+#+BEGIN_SRC
+npm install standard --save-dev
+#+END_SRC
+*** The pluggable linting tool for text and markdown.
+textlint is similar to ESLint, but it's for use with natural language.
+#+BEGIN_SRC
+npm install textlint 
+#+END_SRC

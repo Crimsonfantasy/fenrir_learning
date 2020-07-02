@@ -1,0 +1,2 @@
+* No 3D support is abaliable from the hosts?
+ [[file:vm_3d_issues/issues.org][no 3d support issue and fix]]  

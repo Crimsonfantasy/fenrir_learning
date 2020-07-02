@@ -1,0 +1,10 @@
+* Message: element click intercepted:
+  如果你在尋找elelment後, 使用範例如下 call click時發生 element click intercepted
+  #+include: "./issur.py" src pyhon :line "22-25"
+** solution:  
+ 1. 觀察被click的html是不是用css特色化的button, 而不是真的butto（在div中有type="submit"）, 以下是一個css特色化的button範例：
+    #+include: "./css_btn.html" src html :minlevel 1
+ 2. 從chrome browser 中取用 css seletor路徑,  使用find_element_by_css_selector找出dom element
+    for example:
+    #+include: "./issur.py" src pyhon :line "32-26"
+  

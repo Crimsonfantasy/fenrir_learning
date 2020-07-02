@@ -1,0 +1,4 @@
+* design pattern
+** cloud design pattern
+*** microsoft oline book
+[[https://docs.microsoft.com/zh-tw/azure/architecture/patterns/][cloud_service_design_pattern]]

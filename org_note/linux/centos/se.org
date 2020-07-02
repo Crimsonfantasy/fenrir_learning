@@ -1,3 +1,10 @@
+* show selinux status
+#+BEGIN_SRC shell
+sestatus 
+#+END_SRC
+#+BEGIN_EXAMPLE
+SELinux status:                 disabled
+#+END_EXAMPLE
 * install semanage
 ** cents 7
 -  yum provides semanage

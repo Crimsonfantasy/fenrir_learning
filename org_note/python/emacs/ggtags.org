@@ -1,0 +1,12 @@
+* why do you use ggtags?
+Beacuse it is the most wildly fuctions supported:
+[[https://github.com/oracle/opengrok/wiki/Comparison-with-Similar-Tools][see comparations]]
+* install:
+**  fedora:
+***  [[https://github.com/leoliu/ggtags][how to install ggtags!]]
+***  install exuberant-ctags:
+**** fedora:
+#+BEGIN_SRC shell
+   sudo dnf search global-ctags
+#+END_SRC
+

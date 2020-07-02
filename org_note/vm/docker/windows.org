@@ -1,0 +1,3 @@
+#+TITLE: Windows
+* install on windows home edition
+WSL + docker, [[https://www.padok.fr/en/blog/docker-window][see on here]]

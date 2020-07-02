@@ -1,0 +1,45 @@
+* pdb develop 
+** start pdb with python command
+#+BEGIN_SRC shell
+python -m pdb main.py
+#+END_SRC
+
+* gui debug tool 
+** pdb
+**** show class, function 內容
+#+BEGIN_SRC python
+dir(var_name)).
+#+END_SRC
+** pdbpp++
+   pdb 的加強版,建議使用
+** realgud
+ no experienment
+
+* tag system
+** 安裝elpy
+*** 安裝密技
+    當你發現安裝後功能不正確時, use this command at M^x
+  #+BEGIN_SRC shell
+  elpy-config
+  #+END_SRC
+ 然後把指標移往install的字樣上按下enter, 他會自動幫你安裝
+** ggtags (不要用, 因為find reference無法正常使用)
+*
+ 
+
+
+[[file:emacs/ggtags.org][emacs ggtags]]
+   
+* ELPY tool (2020年嘗試, 最重要的工具)
+  Emacs Python Development Environment
+** 好用short key
+ - find reference:  M^?
+ - find definition: M^.
+ - back to previous point after finding definition： M^,
+ - open document: C^c C^d
+** issue
+*** Elpy cannot find rope, jedi, autopep, yapf, or black in activated venv...
+發現elpy相關的tool無法安裝, pip有安裝相關套件的時候, *我遇到這問題的時候我有使用virtualenv*
+**** solution:
+    1. *elpy-rpc-reinstall-virtualenv*  
+    2. showed up in *elpy-config* again.

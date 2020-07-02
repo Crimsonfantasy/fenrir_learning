@@ -1,0 +1,39 @@
+* if you modify doom config, or want to update doom. You should do that:
+1. Don't forget to run 'doom sync', then restart Emacs, after modifying
+   ~/.doom.d/init.el or ~/.doom.d/packages.el.
+
+   This command ensures needed packages are installed, orphaned packages are
+   removed, and your autoloads/cache files are up to date. When in doubt, run
+   'doom sync'!
+
+2. If something goes wrong, run `doom doctor`. It diagnoses common issues with
+   your environment and setup, and may offer clues about what is wrong.
+
+3. Use 'doom upgrade' to update Doom. Doing it any other way will require
+   additional steps. Run 'doom help upgrade' to understand those extra steps.
+
+4. Access Doom's documentation from within Emacs via 'SPC h D' or 'C-h D' (or
+   'M-x doom/help')
+
+* You must do two things to remove Evil(vim editor):
+1. Remove :editor evil from ~/.doom.d/init.el,
+2. Run doom refresh to clean up lingering dependencies and refresh your autoloads files.
+3. [OPTIONAL] You may want to assign new values to doom-leader-alt-key and doom-localleader-alt-key. These are bound to C-c and C-c l by default.
+
+* 更換字體
+- download Jetbrain Mono font from [[https://www.jetbrains.com/lp/mono/][Mono font]]
+- edit ~/.doom.d/config.el
+ #+BEGIN_SRC lisp
+(setq doom-font (font-spec :family "JetBrains Mono" :size 24)
+      doom-big-font (font-spec :family "JetBrains Mono" :size 36)
+      doom-variable-pitch-font (font-spec :family "JetBrains Mono" :size 24)
+      doom-serif-font (font-spec :family "JetBrains Mono" :weight 'light))
+ #+END_SRC
+-
+
+* python
+** prepare:
+*** install ggtags package
+Because =anaconda-mode-find-references-other-frame= use etags file to find reference,
+We need ggtags to generates etags file, and we also require Projectile to help us generates
+all etags file in our work space. Hence, We need ggtags.

@@ -1,0 +1,14 @@
+* 常用工具:
+** helm
+*** install
+with *M-x package-install RET helm RET*
+** python 
+*** jedi document
+**** install
+*M-x package-install RET jedi RET or*
+**** document
+ [[http://tkf.github.io/emacs-jedi/latest/#configuration][Jedi document]]
+*** elpy
+to bring powerful Python editing to Emacs.
+1. *M-x package-install elpy*
+   

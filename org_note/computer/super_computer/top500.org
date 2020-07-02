@@ -1,0 +1,7 @@
+* Rangking for top 500 super computer:
+** HPCG branchmark:
+   [[https://www.hpcg-benchmark.org/index.html][hpcg offical site]]
+** PetaFLOPS
+   計算每秒浮點數運算
+   FLoating-point Operations Per Second.
+

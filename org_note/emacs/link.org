@@ -1,0 +1,5 @@
+#+TITLE: Link
+* Vianny Lebouteiller
+[[http://irfu.cea.fr/Pisp/vianney.lebouteiller/][Doom使用操牌網]]
+* doom config example from github (臺灣人)
+[[https://github.com/ztlevi/doom-config][doom config]]

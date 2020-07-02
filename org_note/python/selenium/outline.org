@@ -1,0 +1,5 @@
+* codeing
+** tips
+   #+setupfile: ./coding_tips/tips.org
+* issues:
+** [[file:element_click_intercepted/issues.org][element click intercepted]]  

@@ -1,0 +1,7 @@
+* problem
+** A start job is running for Raise network interface?                 :boot:
+#+BEGIN_SRC 
+vi /etc/systemd/system/network-online.target.wants/NetworkManager-wait-online.service 
+#+END_SRC
+1. change TimeoutStartSec=5min to TimeoutStartSec=2sec
+

@@ -1,0 +1,5 @@
+* shortkey for  go into link
+  #+BEGIN_QUOTE
+  C-u c-x c-o
+  #+END_QUOTE
+  and go back with ‘M-x org-mark-ring-goto’.

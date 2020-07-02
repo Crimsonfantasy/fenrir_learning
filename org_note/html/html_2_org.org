@@ -1,0 +1,5 @@
+#+TITLE:
+* html 2 org mode
+#+BEGIN_SRC shell
+pandoc -o cheatsheet.org -f html -t org  'http://sce2.umkc.edu/BIT/burrise/pl/modeling/qanda.html'
+#+END_SRC

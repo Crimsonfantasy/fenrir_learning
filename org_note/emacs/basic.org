@@ -1,0 +1,44 @@
+#+TITLE:
+* reload buffer from file
+#+BEGIN_QUOTE
+C-x C-V
+#+END_QUOTE
+* XREF windows (find reference tool)
+** important navigate
+- M-
+  xref-pop-marker-stack
+- M-
+  anaconda-mode-find-definitions
+- M-=
+  anaconda-mode-find-assignments
+** preview reference #+begin_lang options
+#+BEGIN_QUOTE
+M-RET
+#+END_QUOTE
+* Show class structure (imenu)
+** preview reference
+#+BEGIN_QUOTE
+M-RET
+#+END_QUOTE
+* Debug tool (2020: ipdb)
+install by pip install ipdb
+** 看整個物件的source code
+pinfo2 var_name
+** add watch
+*** sequence commands
+1. display var_name1
+2. display var_name2
+3. display
+
+* Help
+** List all key-bindings available in a given buffer?
+#+BEGIN_SRC shell
+C-h b
+#+END_SRC
+will list all the bindings available in a buffer. This is a mnemonic for help (C-h) bindings (b).
+You can also get a list of keybindings via
+#+BEGIN_SRC shell
+C-h m
+#+END_SRC
+, which is help for the major and minor modes for the buffer. The formatting of this is a little clearer,
+but includes additional information about the modes beyond just listing the keybindings.

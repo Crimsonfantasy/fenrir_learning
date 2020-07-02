@@ -1,0 +1,2 @@
+* performance discusss, Why is Python so slow?                  :performance:
+https://hackernoon.com/why-is-python-so-slow-e5074b6fe55b

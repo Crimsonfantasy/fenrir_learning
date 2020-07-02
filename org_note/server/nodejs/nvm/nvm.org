@@ -1,0 +1,51 @@
+* nvm, the Node Version Manager 
+  see: github [fn:1]
+* How To Install NVM (Node Version Manager) on Fedora
+1. 
+   Node Version Manager (NVM) allows you to quickly install and manage node.js versions.
+ I have written guides on how to install NVM on other operating systems:
+ #+BEGIN_SRC shell
+ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+ #+END_SRC          
+2. 
+   #+BEGIN_SRC shell
+      source ~/.bashrc
+   #+END_SRC
+* usage
+** To download, compile, and install the latest release of node, do this:
+#+BEGIN_SRC shell
+nvm install node # "node" is an alias for the latest version
+#+END_SRC
+
+** To install a specific version of node:
+In place of a version pointer like "0.10" or "5.0" or "4.2.1", you can use the following special default aliases with nvm install, nvm use, nvm run, nvm exec, nvm which, etc:
+node: this installs the latest version of node
+iojs: this installs the latest version of io.js
+stable: this alias is deprecated, and only truly applies to node v0.12 and earlier. Currently, this is an alias for node.
+unstable: this alias points to node v0.11 - the last "unstable" node release, since post-1.0, all node versions are stable. (in SemVer, versions communicate breakage, not stability).
+#+BEGIN_SRC shell
+nvm install 6.14.4 # or 10.10.0, 8.9.1, etc
+#+END_SRC
+** You can list available versions using ls-remote:
+The first version installed becomes the default. New shells will start with the default version of node (e.g., nvm alias default).
+
+#+BEGIN_SRC shell
+nvm ls-remote
+#+END_SRC
+And then in any new shell just use the installed version:
+** nvm use node
+Or you can just run it:
+
+#+BEGIN_SRC shell
+nvm run node --version
+#+END_SRC
+
+** Or, you can run any arbitrary command in a subshell with the desired version of node:
+nvm exec 4.2 node --version
+You can also get the path to the executable to where it was installed:
+#+BEGIN_SRC shell
+nvm which 5.0
+#+END_SRC
+
+#+RESULTS:
+[fn:1] https://github.com/nvm-sh/nvm

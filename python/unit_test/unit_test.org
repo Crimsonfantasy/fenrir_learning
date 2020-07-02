@@ -1,0 +1,7 @@
+* run unit test in command line                                :command_line:
+安全使用的指令
+#+BEGIN_SRC shell
+python -m pytest test/test_menu.py
+#+END_SRC
+** 不可以用 pytest test/test_menu.py的原因:
+你會遭遇到modulenotfounderror的問題, 即使你的資料夾中都有__init__.py

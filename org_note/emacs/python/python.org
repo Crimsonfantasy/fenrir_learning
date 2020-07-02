@@ -1,0 +1,33 @@
+#+TITLE: Python
+* pyvenv 
+1. pyvenv-mode
+   enable pyvenv mode
+2. pyvenv-activate
+   選擇虛擬環境的Dir root
+* 語法檢查tool
+** install flask8 (rank 2 in 2020)
+*** install
+ #+BEGIN_SRC shell
+python -m pip install flake8
+#+END_SRC
+  -
+*** config location:
+- ~/.config/flask8
+- setup.cfg (in project root)
+** install
+pylint (rank 1 in 2020)
+*** generate configuration
+location can
+ - /etc/pylintrc => for default global configuration
+ - ~/.pylintrc => for use
+ - pylintrc => can put at project roo
+ #+BEGIN_SRC shell
+  pylint --generate-rcfile > pylintrc
+ #+END_SRC
+** remove mypy (過時的工具)
+#+BEGIN_SRC shell
+python uninstall mypy
+
+#+END_SRC
+* Debug
+see at [[https://github.com/realgud/realgud][realgud mode]]

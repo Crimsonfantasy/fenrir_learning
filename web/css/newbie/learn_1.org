@@ -1,0 +1,1268 @@
+* 30個你必須記住的CSS選擇器
+
+  by Jeffrey Way9 Jun 2011
+  Difficulty:IntermediateLength:LongLanguages:
+
+  Web DevelopmentFront-EndHTMLCSSCSS Selectors
+
+  30個你必須記住的CSS選擇器
+  所以你學會了最基本的id，class和descendant selectors（子元素選擇器） - 然後你就覺得可以這樣了？ 如果回答是肯定的，那麼你已經錯過了一個極大程度的靈活
+  性。 雖然在本文中我提到的眾多選擇器是在CSS3規範下的一部分，但是，作為結果，只有現代主流的瀏覽器可以使用，不過你依然還是要把它們記下來。
+
+** Star
+
+#+BEGIN_SRC css
+\\* {
+  margin: 0;
+  padding: 0;
+  }
+#+END_SRC
+對於初學者來說，在我們移步至更加高級的選擇器之前，讓我們先攻克這些顯而易見的。
+星號標誌會指向頁面上所有的元素。 很多程序猿都會用這個訣竅來將margin和padding歸零。
+雖說這個對於一個快速的測試是肯定沒問題的，但是我建議你永遠都不要
+將其應用於生產環境的代碼中。 它為瀏覽器帶來太多負擔，而且是完全沒必要的。
+星號*可以同時被用於子對象選擇器中。 
+
+#+BEGIN_SRC css
+#container * {
+ border: 1px solid black;
+}
+#+END_SRC
+
+這樣可以指向所有的#container div的子對象。 同樣的，如果可能的話，盡可能不要使用這個方法。
+
+#+BEGIN_EXAMPLE html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>CSS Selectors</title>
+    <style>
+       * { border: 1px dotted black; }
+    </style>
+</head>
+<body>
+
+<div>
+   <p> My paragraph here. </p>
+   <ul>
+      <li> List Item 1</li>
+      <li> List Item 2</li>
+   </ul>
+
+   <ul>
+      <li> List Item 3</li>
+      <li> List Item 4</li>
+   </ul>   
+</div>
+
+</body>
+</html>
+#+END_EXAMPLE
+
+** #X
+#+BEGIN_SRC css
+#container {
+   width: 960px;
+   margin: auto;
+}
+#+END_SRC
+在選擇器前面加井號鍵可以 *允許我們指向id*  這是一個最常用的選擇器使用，不過當使用id選擇器的時候要注意。
+問問你自己：我真的一定需要為這個元素添加id來指向他麼？
+*id選擇器的規則非常的嚴格, 而且因為他是唯一的，所以不允許被再次使用* 。
+ 如果可能的話，首先嘗試使用tag名，這是一個HTML5版本的新元素，或者甚至試試偽類。
+ #+BEGIN_EXAMPLE html
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>CSS Selectors</title>
+    <style>
+      #container {
+         background: #e3e3e3;
+      }
+    </style>
+</head>
+<body>
+
+<div id="container">
+   <p> My paragraph here. </p>
+   <ul>
+      <li> List Item 1</li>
+      <li> List Item 2</li>
+   </ul>
+
+   <ul>
+      <li> List Item 3</li>
+      <li> List Item 4</li>
+   </ul>   
+</div>
+
+</body>
+</html>
+ #+END_EXAMPLE
+** .X
+#+BEGIN_SRC css
+.error {
+  color: red;
+}
+#+END_SRC
+
+這是一個class選擇器。 *id和class的不同點就是class可以同時標記多個元素* 
+當你想要你的樣式應用到一組元素的時候你可以使用class。 或者，你也可以使用id來刻
+意讓一個單獨的元素使用特別的樣式。
+#+BEGIN_EXAMPLE css
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>CSS Selectors</title>
+    <style>
+      .warning {
+         color: red;
+      }
+    </style>
+</head>
+<body>
+
+<div id="container">
+   <p> My paragraph here. </p>
+   <ul>
+      <li> List Item 1</li>
+      <li> List Item 2</li>
+   </ul>
+
+   <ul>
+      <li class="warning">Something went Wrong </li>
+      <li> List Item 4</li>
+   </ul>   
+</div>
+</body>
+</html>
+
+#+END_EXAMPLE
+** X Y
+
+#+BEGIN_SRC css
+li a {
+  text-decoration: none;
+}
+#+END_SRC
+下一個最常見的選擇器是 *descendant selector（子對象選擇器)* 。 
+當你需要更明確的選擇某個目標時，你就使用這個選擇器。 舉個例子，假設你不想選擇所有的錨點
+對象，你只是想選擇所有的無序列表以下的錨點對象？ 這樣的情況就特別的需要使用子對象選擇器了。 
+專家提示 - 如果你的選擇器看起來像是X Y Z A B.error，那麼你就做錯了。 
+記得始終問問你自己是不是真的特別需要應用這麼精確的負擔重的選擇器。
+#+BEGIN_EXAMPLE css
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>CSS Selectors</title>
+    <style>
+       div p {
+         color: red;
+       }
+    </style>
+</head>
+<body>
+
+<div id="container">
+   <p> My paragraph here. </p>
+   <ul>
+      <li> List Item 1</li>
+      <li> List Item 2</li>
+   </ul>
+
+   <ul>
+      <li class="warning">Something went Wrong </li>
+      <li> List Item 4</li>
+   </ul>   
+</div>
+
+<p> Paragraph outside of div </p>
+</body>
+</html>
+#+END_EXAMPLE
+
+** X
+#+BEGIN_SRC css
+a { color: red; }
+ul { margin-left: 0; }
+#+END_SRC
+如果你想要選擇當前頁面所有的相同type（種類）的元素，
+你會考慮使用id或者class名麼？ 如果你想保持你代碼的干淨，就用type（類）選擇器好了。 如果你需要選
+中所有的無序列表，使用ul {}。
+
+#+BEGIN_EXAMPLE html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>CSS Selectors</title>
+    <style>
+       div {
+         border: 1px solid black;
+       }
+    </style>
+</head>
+<body>
+
+<div id="container">
+   <p> My paragraph here. </p>
+   <ul>
+      <li> List Item 1</li>
+      <li> List Item 2</li>
+   </ul>
+
+   <ul>
+      <li class="warning">Something went Wrong </li>
+      <li> List Item 4</li>
+   </ul>   
+</div>
+
+<p> Paragraph outside of div </p>
+</body>
+</html>
+#+END_EXAMPLE
+
+** css Links
+   In addition, links can be styled differently depending on what state they are in.
+- The four links states are:
+  a:link - a normal, unvisited link
+  a:visited - a link the user has visited
+  a:hover - a link when the user mouses over it
+  a:active - a link the moment it is clicked
+#+BEGIN_SRC css
+a:link { color: red; }
+a:visted { color: purple; }
+#+END_SRC
+#+BEGIN_EXAMPLE css
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>CSS Selectors</title>
+    <style>
+       a:link { color: red; }
+       a:visted { color: purple; }
+    </style>
+</head>
+<body>
+   Lorem ipsum dolor sit amet, consectetur 
+   <a href="#">adipisicing</a> 
+   elit, sed do eiusmod 
+   <a href="http://net.tutsplus.com">tempor</a> 
+   incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.  
+</body>
+</html>
+#+END_EXAMPLE
+** X + Y
+#+BEGIN_SRC css
+ul + p {
+   color: red;
+}
+#+END_SRC
+
+這個被稱為 *相鄰兄弟選擇器* 。 它僅僅會選擇剛好在左邊元素之前的元素。 
+在這種情況下，僅僅第一個ul之後的段落()會被賦予紅色。
+#+BEGIN_SRC css
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>CSS Selectors</title>
+    <style>
+       ul + p {
+         color: red;
+       }
+    </style>
+</head>
+<body>
+
+   <div id="container">
+      <ul>
+         <li> List Item </li>
+         <li> List Item </li>
+         <li> List Item </li>
+         <li> List Item </li>
+      </ul>
+
+      <p> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor. </p>
+   </div>
+
+</body>
+</html>
+#+END_SRC
+
+** X > Y
+
+#+BEGIN_SRC css
+div#container > ul {
+  border: 1px solid black;
+}
+#+END_SRC
+普通的X Y和X > Y的不同是後者僅僅選擇它的直接的子對象。 舉個例子，考慮一下以下的情況。
+#+BEGIN_SRC css
+   <div id="container">
+      <ul>
+         <li> List Item
+           <ul>
+              <li> Child </li>
+           </ul>
+         </li>
+         <li> List Item </li>
+         <li> List Item </li>
+         <li> List Item </li>
+      </ul>
+   </div>
+#+END_SRC
+一個#container > ul的選擇僅僅會選中那些包含id名container的div下的直接子對象ul。
+它並不會指向，舉個例子，第一個li裡面的子對象ul。 
+由於這個原因我們可以得出，使用子組合器有很多的性能上的利益。 
+事實上，當使用JavaScript為基礎的CSS選擇器引擎的情況下是非常推薦的。
+#+BEGIN_SRC css
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>CSS Selectors</title>
+    <style>
+       #container > ul {
+          border: 1px solid black;
+       }
+    </style>
+</head>
+<body>
+
+   <div id="container">
+      <ul>
+         <li> List Item
+         <ul>
+            <li> Child </li>
+         </ul>
+         </li>
+         <li> List Item </li>
+         <li> List Item </li>
+         <li> List Item </li>
+      </ul>
+
+      <p> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor. </p>
+      <p> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor. </p>
+      <p> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor. </p>
+      <p> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor. </p>
+   </div>
+
+</body>
+</html>
+#+END_SRC
+
+** X ~ Y
+#+BEGIN_SRC css
+ul ~ p {
+   color: red;
+}
+#+END_SRC
+
+這個一般 *兄弟組合器和相鄰兄弟組合器X + Y非常相似，但是，更加不嚴格* .
+相鄰兄弟選擇器（ul + p）只會選擇剛剛好在前一個選擇器之前的第一個元素，而這個選擇
+器的範圍會更廣一點。 在我們上面的案例中，它會選擇所有的p元素，只要他們是在ul之後的。 
+#+BEGIN_SRC html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>CSS Selectors</title>
+    <style>
+       ul ~ p {
+          color: red;
+       }
+    </style>
+</head>
+<body>
+
+   <div id="container">
+      <ul>
+         <li> List Item
+         <ul>
+            <li> Child </li>
+         </ul>
+         </li>
+         <li> List Item </li>
+         <li> List Item </li>
+         <li> List Item </li>
+      </ul>
+
+      <p> Lorem ipsum dolor sit amet, <a href="#" title="Some title">consectetur</a> adipisicing elit, sed do eiusmod tempor. </p>
+      <p> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor. </p>
+      <p> Lorem ipsum dolor sit amet, consectetur <a href="#">adipisicing</a> elit, sed do eiusmod tempor. </p>
+      <p> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor. </p>
+   </div>
+
+</body>
+</html>
+
+#+END_SRC
+
+** X[title]
+
+#+BEGIN_SRC css
+a[title] {
+   color: green;
+}
+#+END_SRC
+該選擇器適用於屬性選擇器，在我們上面的例子裡，這會僅僅選擇所有包含有title屬性的的錨點對象。 
+那些並沒有title屬性的將不會接收到該特有的樣式。 
+
+#+BEGIN_SRC html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>CSS Selectors</title>
+    <style>
+       a[title] {
+         color: green;
+       }
+    </style>
+</head>
+<body>
+
+   <div id="container">
+      <ul>
+         <li> List Item
+         <ul>
+            <li> Child </li>
+         </ul>
+         </li>
+         <li> List Item </li>
+         <li> List Item </li>
+         <li> List Item </li>
+      </ul>
+
+      <p> Lorem ipsum dolor sit amet, <a href="#" title="Some title">consectetur</a> adipisicing elit, sed do eiusmod tempor. </p>
+      <p> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor. </p>
+      <p> Lorem ipsum dolor sit amet, consectetur <a href="#">adipisicing</a> elit, sed do eiusmod tempor. </p>
+      <p> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor. </p>
+   </div>
+
+</body>
+</html>
+#+END_SRC
+** X[href="foo"]
+#+BEGIN_SRC css
+a[href="https://net.tutsplus.com"] {
+  color: #1f6053; /* nettuts green */
+}
+#+END_SRC
+上面這個小片段將為所有包含鏈接https://net.tutsplus.com的錨點對象添加樣式； 
+他們將接收到我們的標誌性的綠色。其他的對象將保持不被改變的狀態。 其他的對
+象將保持不被改變的狀態。
+注意：我們將值放在了引號裡。 記住如果你使用JavaScript CSS選擇器引擎也要做同樣的事情。
+如果可能的話，總是使用CSS3選擇器而不是非官方的方法。
+這樣就可以工作了，不過，還是有一點僵硬， 如果這個鏈接確實是指向Nettuts+，但是，
+也許，這個路徑是nettuts.com而不是完整的url呢？ 在這種情況下，
+我們可以使用一點點普通表達式的語法在裡面。
+#+BEGIN_SRC 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>CSS Selectors</title>
+    <style>
+      a[href*="tuts"] {
+        color: #1f6053; /* nettuts green */
+      }  
+    </style>
+</head>
+<body>
+
+   <div id="container">
+      <ul>
+         <li> List Item
+         <ul>
+            <li> Child </li>
+         </ul>
+         </li>
+         <li> List Item </li>
+         <li> List Item </li>
+         <li> List Item </li>
+      </ul>
+
+      <p> Lorem ipsum dolor sit amet, <a href="#" title="Some title">consectetur</a> adipisicing elit, sed do <a href="http://nettuts.com">Nettuts</a> tempor. </p>
+      <p> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor. </p>
+      <p> Lorem ipsum dolor sit amet, consectetur <a href="#">adipisicing</a> elit, sed do eiusmod tempor. </p>
+      <p> Lorem ipsum <a href="http://net.tutsplus.com">Nettuts+</a> sit amet, consectetur adipisicing elit, sed do eiusmod tempor. </p>
+   </div>
+
+</body>
+</html>
+
+#+END_SRC
+
+** X[href^="http"]
+#+BEGIN_SRC css
+a[href^="http"] {
+   background: url(path/to/external/icon.png) no-repeat;
+   padding-left: 10px;
+}
+#+END_SRC
+你有沒有疑問過為什麼有些網站可以在外部鏈接的邊上顯示一個小的圖標？ 我相信你以前肯定看到過這種情況；它們是很貼心的提醒你即將引導你到一個完全不同的外
+部網站。
+這是一個小的腰帶狀包含有克拉符號的標誌。 這是最常見用在普通表達式裡面的一種標誌，一般會出現在字符串的開始。 如果你希望指向所有的包含href且開頭是http
+的錨點對象，我們可以使用上面所提到的相似選擇器。
+注意，我們並不需要搜索https://，這個是不必要的，而且這樣的話就無法選中那些url是以https://開頭的了。 
+現在，如果我們希望為所有的，假設，指向照片的錨點來設置樣式。 在這種情況下，我們就需要搜索結束的字符串。
+
+#+BEGIN_SRC html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>CSS Selectors</title>
+    <style>
+      a[href^="http"] {
+         color: red;
+      }  
+    </style>
+</head>
+<body>
+
+   <div id="container">
+      <ul>
+         <li> List Item
+         <ul>
+            <li> Child </li>
+         </ul>
+         </li>
+         <li> List Item </li>
+         <li> List Item </li>
+         <li> List Item </li>
+      </ul>
+
+      <p> Lorem ipsum dolor sit amet, <a href="#" title="Some title">consectetur</a> adipisicing elit, sed do <a href="http://nettuts.com">Nettuts</a> tempor. </p>
+      <p> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor. </p>
+      <p> Lorem ipsum dolor sit amet, consectetur <a href="#">adipisicing</a> elit, sed do eiusmod tempor. </p>
+      <p> Lorem ipsum <a href="http://net.tutsplus.com">Nettuts+</a> sit amet, consectetur adipisicing elit, sed do eiusmod tempor. </p>
+   </div>
+
+</body>
+</html>
+#+END_SRC
+
+** X[href$=".jpg"]
+
+#+BEGIN_SRC css
+a[href$=".jpg"] {
+   color: red;
+}
+#+END_SRC
+同樣的，我們使用普通的表達式符號$，來提到尾部的字符串。 在這種情況下，我們需要搜索所有包含鏈接到圖片的錨點——或者至少也是一個以.jpg結尾的url。 記
+住，這個選擇器肯定不能被用在gifs和pngs上。
+
+** X[data-*="foo"]
+#+BEGIN_SRC css
+a[data-filetype="image"] {
+   color: red;
+}
+#+END_SRC
+
+參考到第8條，我們該如何來選中所有不同種類的圖片呢：png，jpeg，jpg，gif？ 好吧，我們需要創建多個選擇器，諸如：
+#+BEGIN_SRC css
+a[href$=".jpg"],
+a[href$=".jpeg"],
+a[href$=".png"],
+a[href$=".gif"] {
+   color: red;
+}
+#+END_SRC
+但是，這麼做太蛋疼了，而且還沒效率。 另一種解決辦法會使用自定義屬性。 如果我們添加自己的data-filetype屬性到每一個鏈接到圖片的錨點會發生什麼呢？
+
+#+BEGIN_SRC html
+<a href="path/to/image.jpg" data-filetype="image"> Image Link </a>
+#+END_SRC
+然後，由於有這個hook在，我們可以使用基本的屬性選擇器來僅僅指向我們需要的那些錨點。 
+
+#+BEGIN_SRC css
+a[data-filetype="image"] {
+   color: red;
+}
+
+#+END_SRC
+
+** X[foo~="bar"] X[foo~="xxx"]
+
+#+BEGIN_SRC css
+a[data-info~="external"] {
+   color: red;
+}
+
+a[data-info~="image"] {
+   border: 1px solid black;
+}
+#+END_SRC
+這裡有一個特別的選擇器，如果你使用的會給你的朋友留下深刻的印象。 並不是所有的人都知道這個小訣竅。
+ *這個標籤的標誌（~）可以讓我們分別指向那些有空格分開的多個屬性值*
+
+接著使用上面的我們在第15點提到的自定義屬性，我們創建一個data-info的屬性，可以允許使用空格來列出我們需要的不同記錄。 在這種情況下，我們需要留下記錄來
+對應外部鏈接以及鏈接到圖片——只是舉個例子。
+
+#+BEGIN_SRC html
+"<a href="path/to/image.jpg" data-info="external image"> Click Me, Fool </a>
+#+END_SRC
+
+
+當這段基礎代碼到位以後，我們可以指向任何的其中一個值，這裡就需要使用這個~標記屬性選擇的小技巧。
+
+#+BEGIN_SRC css
+
+/* Target data-info attr that contains the value "external" */
+a[data-info~="external"] {
+   color: red;
+}
+
+/* And which contain the value "image" */
+a[data-info~="image"] {
+  border: 1px solid black;
+}
+
+#+END_SRC
+很厲害吧，嗯哼？ 
+
+#+BEGIN_SRC html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>CSS Selectors</title>
+    <style>
+ a[data-info~="external"] {
+   color: red;
+}
+
+a[data-info~="image"] {
+   border: 1px solid black;
+}
+    </style>
+</head>
+<body>
+
+   <div id="container">
+      <ul>
+         <li> List Item
+         <ul>
+            <li> Child </li>
+         </ul>
+         </li>
+         <li> List Item </li>
+         <li> List Item </li>
+         <li> List Item </li>
+      </ul>
+
+      <p> Lorem ipsum dolor sit amet, <a href="http://www.google.com" data-info="external" title="Some title">consectetur</a> adipisicing elit, sed do <a href="http://nettuts.com">Nettuts</a> tempor. </p>
+      <p> <a href="http://d2o0t5hpnwv4c1.cloudfront.net/817_rubyNewbies1/preivew.png" data-filetype="image">PNG Image</a> ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor. </p>
+      <p> Lorem ipsum dolor sit amet, consectetur <a href="#">adipisicing</a> elit, sed do eiusmod tempor. </p>
+      <p> Lorem ipsum <a href="http://net.tutsplus.com">Nettuts+</a> sit amet, consectetur "<a href="http://d2o0t5hpnwv4c1.cloudfront.net/839_git/preview.jpg" data-info="external image">Getting Good with Git</a>" elit, sed do eiusmod tempor. </p>
+   </div>
+
+</body>
+</html>
+#+END_SRC
+
+** X:checked
+
+#+BEGIN_SRC css
+input[type=radio]:checked {
+   border: 1px solid black;
+}
+#+END_SRC
+這是一個偽類，它僅僅會指向一個用戶端被選中的元素 - 像是單選框或者多選框。 就是像你想像的這麼簡單。
+#+BEGIN_SRC html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>CSS Selectors</title>
+    <style>
+       input[type=radio]:checked + label {
+          color: blue;
+       }
+    </style>
+</head>
+<body>
+
+   <form>
+      <input type="radio" name="rad" value="Radio Button">
+      <label for="rad"> Radio Button</label>
+   </form>
+</body>
+</html>
+#+END_SRC
+
+** X:after
+
+這個before和after的偽類實在是太虎了。 看起來，每天都有人在嘗試尋找新的且有創造性的方法來更有效的使用它們。 
+它們簡單的在選中的元素周圍生成內容。
+
+很多人都是在嘗試解決clear-fix的時候被介紹使用這些類並嘗試用它們來hack。
+
+#+BEGIN_SRC css
+.clearfix:after {
+    content: "";
+    display: block;
+    clear: both;
+    visibility: hidden;
+    font-size: 0;
+    height: 0;
+    }
+
+.clearfix { 
+   *display: inline-block; 
+   _height: 1%;
+}
+#+END_SRC
+這個hack使用了:after偽類來添加一個空格到元素的後面，然後將它清除。 
+這是你應該放進你工具盒的一個完美的小訣竅，特別是當你想使用overflow：hidden的時候
+卻又不可能的情況下。
+另一種有創意的方法，參考我的快速小貼士如何創建陰影。 
+根據CSS3選擇器的說明，你其實應該使用兩個冒號::作為偽元素的語法。
+ 然而，為了兼容性，用戶端也會接受單一冒號的使用。 事實上，在這裡，更明智的辦法還
+是使用單一冒號的版本到你的項目裡。兼容性
+** X:not(selector)
+
+#+BEGIN_SRC css
+div:not(#container) {
+   color: blue;
+}
+#+END_SRC
+
+negation偽類特別的有用。 讓我們說，我想選擇所有的div，除了一個有id是container的。
+上面這個小片段可以將工作完成的很完美。
+或者，如果你想選擇所有的單個元素（不建議）除了段落對象，我們可以做如下：
+#+BEGIN_SRC 
+*:not(p) {
+  color: green;}
+#+END_SRC
+
+#+BEGIN_SRC html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>CSS Selectors</title>
+    <style>
+   div:not(#container) {
+      color: blue;
+   }
+
+   *:not(p) {
+      color: green;
+   }
+    </style>
+</head>
+<body>
+
+   <div id="container">
+      <ul>
+         <li> List Item
+         <ul>
+            <li> Child </li>
+         </ul>
+         </li>
+         <li> List Item </li>
+         <li> List Item </li>
+         <li> List Item </li>
+      </ul>
+
+      <ul>
+         <li>
+            <a href="#"> Anchor Tag </a>
+         </li>
+         <li>
+            <a href="#"> Anchor Tag </a>
+         </li>
+         <li>
+            <a href="#"> Anchor Tag </a>
+         </li>
+         <li>
+            <a href="#"> Anchor Tag </a>
+         </li>
+      </ul>
+
+      <p> Lorem ipsum dolor sit amet, <a href="http://www.google.com" data-info="external" title="Some title">consectetur</a> adipisicing elit, sed do <a href="http://nettuts.com">Nettuts</a> tempor. </p>
+      <p> <a href="http://d2o0t5hpnwv4c1.cloudfront.net/817_rubyNewbies1/preivew.png" data-filetype="image">PNG Image</a> ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor. </p>
+      <p> Lorem ipsum dolor sit amet, consectetur <a href="#">adipisicing</a> elit, sed do eiusmod tempor. </p>
+      <p> Lorem ipsum <a href="http://net.tutsplus.com">Nettuts+</a> sit amet, consectetur "<a href="http://d2o0t5hpnwv4c1.cloudfront.net/839_git/preview.jpg" data-info="external image">Getting Good with Git</a>" elit, sed do eiusmod tempor. </p>
+   </div>
+
+   <div> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.  </div>
+
+</body>
+</html>
+#+END_SRC
+
+** X::pseudoElement
+
+#+BEGIN_SRC css
+p::first-line {
+   font-weight: bold;
+   font-size: 1.2em;
+}
+#+END_SRC
+
+我們可以使用偽元素（設計為::）來為元素的分段添加樣式，比如第一行、或者第一個文字等。
+記得，這些必須作用到一個段落的元素中才能有效果。
+一個偽元素是由兩個冒號構成的::
+指向段落中的第一個文字
+
+#+BEGIN_SRC css
+p::first-letter {
+   float: left;
+   font-size: 2em;
+   font-weight: bold;
+   font-family: cursive;
+   padding-right: 2px;
+}
+#+END_SRC
+這個小片段是一個抽象的概念，可以找到頁面上的所有段落，並且找到僅僅是它們最開始的文字作為元素。 
+這個最常被使用在創建報紙上每篇文章的第一個字母的樣式上。
+指向段落中的第一行
+
+#+BEGIN_SRC css
+p::first-line {
+   font-weight: bold;
+   font-size: 1.2em;
+}
+#+END_SRC
+
+相似的，::first-line偽元素會按我們期待的，僅僅為第一行元素添加樣式。 
+ “由於目前已有樣式表的兼容性，用戶端必須也要支持前一個在CSS1和2裡面被介紹的冒號的註釋方法（
+換句話說就是:first-line，first-letter，:before和:after ）。
+ 這些兼容性在我們本次介紹的新的偽元素類中並不被允許。” - 外部資源
+
+#+BEGIN_SRC html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>CSS Selectors</title>
+    <style>
+      p::first-line {
+         font-weight: bold;
+         font-size: 1.2em;
+      }
+
+      p::first-letter {
+         float: left;
+         font-weight: bold;
+         font-family: cursive;
+         font-size: 2em;
+         padding-right: 2px;
+      }
+    </style>
+</head>
+<body>
+
+   <div id="container">
+      <ul>
+         <li> List Item
+         <ul>
+            <li> Child </li>
+         </ul>
+         </li>
+         <li> List Item </li>
+         <li> List Item </li>
+         <li> List Item </li>
+      </ul>
+
+      <ul>
+         <li>
+            <a href="#"> Anchor Tag </a>
+         </li>
+         <li>
+            <a href="#"> Anchor Tag </a>
+         </li>
+         <li>
+            <a href="#"> Anchor Tag </a>
+         </li>
+         <li>
+            <a href="#"> Anchor Tag </a>
+         </li>
+      </ul>
+
+      <p> Lorem ipsum dolor sit amet, <a href="http://www.google.com" data-info="external" title="Some title">consectetur</a> adipisicing elit, sed do <a href="http://nettuts.com">Nettuts</a> tempor.  Lorem ipsum dolor sit amet, <a href="http://www.google.com" data-info="external" title="Some title">consectetur</a> adipisicing elit, sed do <a href="http://nettuts.com">Nettuts</a> tempor. Lorem ipsum dolor sit amet, <a href="http://www.google.com" data-info="external" title="Some title">consectetur</a> adipisicing elit, sed do <a href="http://nettuts.com">Nettuts</a> tempor.  Lorem ipsum dolor sit amet, <a href="http://www.google.com" data-info="external" title="Some title">consectetur</a> adipisicing elit, sed do <a href="http://nettuts.com">Nettuts</a> tempor. </p>
+      <p> <a href="http://d2o0t5hpnwv4c1.cloudfront.net/817_rubyNewbies1/preivew.png" data-filetype="image">PNG Image</a> ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor. </p>
+      <p> Lorem ipsum dolor sit amet, consectetur <a href="#">adipisicing</a> elit, sed do eiusmod tempor. </p>
+      <p> Lorem ipsum <a href="http://net.tutsplus.com">Nettuts+</a> sit amet, consectetur "<a href="http://d2o0t5hpnwv4c1.cloudfront.net/839_git/preview.jpg" data-info="external image">Getting Good with Git</a>" elit, sed do eiusmod tempor. </p>
+   </div>
+
+   <div> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.  </div>
+
+</body>
+</html>
+#+END_SRC
+
+** X:nth-child(n)
+
+#+BEGIN_SRC css
+li:nth-child(3) {
+   color: red;
+}
+#+END_SRC
+還記得我們沒辦法從一疊元素中選擇特定的元素的那些日子麼？ 這個nth-child偽類會解決這些問題！
+請注意，nth-child接受整數的參數，然而，這個參數不是以0為基數的。 如果你希望指向第二行物體，使用li:nth-child(2)。 
+我們甚至可以使用這個來選擇不同組合的子對象。 舉個例子，我們可以用li:nth-child(4n)來選擇所有的第四個列表中的物體。 
+舉例：如果定義如下
+#+BEGIN_SRC html
+ <style>
+       li:nth-child(2) {
+         color: red;
+       }
+   </style>
+#+END_SRC
+結果會是這樣：
+#+BEGIN_QUOTE
+ <ul>
+         <li> List Item
+         <ul>
+            <li> Child </li>
+            *<li> Child </li>* -> red
+            <li> Child </li>
+         </ul>
+         </li>
+         *<li> List Item </li>* -> red
+         <li> List Item </li>
+         <li> List Item </li>
+      </ul>
+#+END_QUOTE
+#+BEGIN_SRC html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>CSS Selectors</title>
+    <style>
+       li:nth-child(2) {
+         color: red;
+       }
+    </style>
+</head>
+<body>
+
+   <div id="container">
+      <ul>
+         <li> List Item
+         <ul>
+            <li> Child </li>
+            <li> Child </li>
+            <li> Child </li>
+         </ul>
+         </li>
+         <li> List Item </li>
+         <li> List Item </li>
+         <li> List Item </li>
+      </ul>
+
+      <ul>
+         <li>
+            <a href="#"> Anchor Tag </a>
+         </li>
+         <li>
+            <a href="#"> Anchor Tag </a>
+         </li>
+         <li>
+            <a href="#"> Anchor Tag </a>
+         </li>
+         <li>
+            <a href="#"> Anchor Tag </a>
+         </li>
+      </ul>
+
+      <p> Lorem ipsum dolor sit amet, <a href="http://www.google.com" data-info="external" title="Some title">consectetur</a> adipisicing elit, sed do <a href="http://nettuts.com">Nettuts</a> tempor.  Lorem ipsum dolor sit amet, <a href="http://www.google.com" data-info="external" title="Some title">consectetur</a> adipisicing elit, sed do <a href="http://nettuts.com">Nettuts</a> tempor. Lorem ipsum dolor sit amet, <a href="http://www.google.com" data-info="external" title="Some title">consectetur</a> adipisicing elit, sed do <a href="http://nettuts.com">Nettuts</a> tempor.  Lorem ipsum dolor sit amet, <a href="http://www.google.com" data-info="external" title="Some title">consectetur</a> adipisicing elit, sed do <a href="http://nettuts.com">Nettuts</a> tempor. </p>
+      <p> <a href="http://d2o0t5hpnwv4c1.cloudfront.net/817_rubyNewbies1/preivew.png" data-filetype="image">PNG Image</a> ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor. </p>
+      <p> Lorem ipsum dolor sit amet, consectetur <a href="#">adipisicing</a> elit, sed do eiusmod tempor. </p>
+      <p> Lorem ipsum <a href="http://net.tutsplus.com">Nettuts+</a> sit amet, consectetur "<a href="http://d2o0t5hpnwv4c1.cloudfront.net/839_git/preview.jpg" data-info="external image">Getting Good with Git</a>" elit, sed do eiusmod tempor. </p>
+   </div>
+
+   <div> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.  </div>
+
+</body>
+</html>
+#+END_SRC
+** X:nth-last-child(n)
+#+BEGIN_SRC css
+li:nth-last-child(2) {
+   color: red;
+}
+#+END_SRC
+如果你有一個在ul里數量龐大的列表，而且僅僅需要選擇倒數第三個物品要怎麼辦？ 與其使用li:nth-child(397)，不如使用nth-last-child來作為替代的偽類。
+這種技術的工作原理幾乎和第十六點以後的方法相似，然而，不同的是它在集合的末尾開始和工作並反向數數字。
+** X:nth-of-type(n)
+
+#+BEGIN_SRC css
+ul:nth-of-type(3) {
+   border: 1px solid black;
+}
+
+#+END_SRC
+
+有時候，與其說選擇child，不如說你會需要根據type的元素來選擇。 
+想想一下，標記包含了5個無序列表。 如果你希望僅僅給第三個ul，並且你並沒有一個特別的id與之掛鉤，你可以使用nth-of-type(n)偽類來選擇。 在上面的小片段裡，
+只有第三個ul會在周圍有邊框。
+
+#+BEGIN_SRC html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>CSS Selectors</title>
+    <style>
+ul:nth-child(3) {
+   border: 1px solid black;
+}
+    </style>
+</head>
+<body>
+
+   <div id="container">
+      <ul>
+         <li> List Item
+         <ul>
+            <li> Child </li>
+            <li> Child </li>
+            <li> Child </li>
+         </ul>
+         </li>
+         <li> List Item </li>
+         <li> List Item </li>
+         <li> List Item </li>
+      </ul>
+
+      <ul>
+         <li>
+            <a href="#"> Anchor Tag </a>
+         </li>
+         <li>
+            <a href="#"> Anchor Tag </a>
+         </li>
+         <li>
+            <a href="#"> Anchor Tag </a>
+         </li>
+         <li>
+            <a href="#"> Anchor Tag </a>
+         </li>
+      </ul>
+
+      <ul>
+         <li> List Items </li>
+         <li> List Items </li>
+         <li> List Items </li>
+      </ul>
+</body>
+</html>
+
+#+END_SRC
+** X:nth-last-of-type(n)
+#+BEGIN_SRC css
+ul:nth-last-of-type(3) {
+   border: 1px solid black;
+}
+#+END_SRC
+** X:first-child, X:last-child
+#+BEGIN_SRC css
+ul li:first-child {
+   border-top: none;
+}
+#+END_SRC
+這個結構性的偽類允許我們僅指向父元素的第一個子對象。 你會經常的使用到這個來去除第一個和最後一個列表物品的邊框。 
+舉個例子，如果你有一個很多行的列表，每個元素都包含border-top和border-bottom。 如果是這種情況，第一個和最後一個元素會看起來有點奇怪。 
+很多設計師都會使用class來命名first和last來修復這個問題。 作為替代的，你可以使用這些偽類去處理。
+#+BEGIN_SRC 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>CSS Selectors</title>
+    <style>
+
+       ul {
+         width: 200px;
+         background: #292929;
+         color: white;
+         list-style: none;
+         padding-left: 0;
+      }
+
+      li {
+         padding: 10px;
+         border-bottom: 1px solid black;
+         border-top: 1px solid #3c3c3c;
+      }
+
+ li:first-child {
+    border-top: none;
+}
+
+li:last-child {
+   border-bottom: none;
+}
+    </style>
+</head>
+<body>
+
+   <div id="container">
+      <ul>
+         <li> List Item </li>
+         <li> List Item </li>
+         <li> List Item </li>
+      </ul>
+</body>
+</html>
+
+#+END_SRC
+** X:only-of-type
+
+#+BEGIN_SRC css
+li:only-of-type {
+   font-weight: bold;
+}
+
+#+END_SRC
+
+這個結構性的偽類可以使用到很明智的地方。 
+它會指向那些在其父對象容器中沒有兄弟姐妹的元素。 舉個例子，我們來選中所有的ul，這些ul都只有一個列表元素。 
+首先，問問你自己要如何完成這個工作？ 你可以使用ul li，不過，這樣會指向所有的列表元素。
+ 唯一的解決辦法就是使用only-of-type。
+ul > li:only-of-type {
+   font-weight: bold;
+}
+#+BEGIN_SRC 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>CSS Selectors</title>
+    <style>
+       div p:only-of-type {
+         color: red;
+      }
+
+      li:only-of-type {
+         font-weight: bold;
+      }
+    </style>
+</head>
+<body>
+
+<div>
+   <p> My paragraph here. </p>
+   <ul>
+      <li> List Item </li>
+      <li> List Item </li>
+   </ul>
+</div>
+
+<div>
+   <p> Two paragraphs total. </p>
+   <p> Two paragraphs total. </p>
+   <ul>
+      <li> List Item </li>
+   </ul>
+</div>
+</body>
+</html>
+
+
+#+END_SRC
+** X:first-of-type
+
+first-of-type偽類允許你選擇第一個相同類的兄弟姐妹。 
+一個測試
+為了更好地理解這個，我們需要做一個測試。 複製下面的這段代碼到你的編輯器裡：
+
+#+BEGIN_SRC html
+<div>
+   <p> My paragraph here. </p>
+   <ul>
+      <li> List Item 1 </li>
+      <li> List Item 2 </li>
+   </ul>
+
+   <ul>
+      <li> List Item 3 </li>
+      <li> List Item 4 </li>
+   </ul>   
+</div>
+
+#+END_SRC
+
+現在，先試試不往下看，嘗試著搞清楚如何只選中“List item 2”。 當你搞明白了（或者放棄了），接著往下讀。
+
+解決方案1
+
+有幾種不同的方法可以解決這個小測驗。 我們來回顧其中少數的幾個。 首先我們要使用first-of-type。 
+
+#+BEGIN_SRC css
+ul:first-of-type > li:nth-child(2) {
+   font-weight: bold;
+}
+
+#+END_SRC
+這個片段本質上來看可以這麼說，“找到頁面上的第一個無序列表，然後找到其最接近的子對象，它們是列表下的元素。 接下來，接著向下過濾到僅選擇第二個列表中的
+元素。
+
+解決方案2
+
+另外一個選項是使用相鄰兄弟選擇器。
+
+#+BEGIN_SRC css
+p + ul li:last-child {
+   font-weight: bold;
+}
+
+#+END_SRC
+在這個情況下，我們可以看出ul是在p之前的對象，然後我們需要找到它裡面最後一個子對象。
+
+解決方案3
+
+當我們想要使用這個選擇器的時候，我們可能會感覺到非常的不開心或者非常好笑。 
+
+#+BEGIN_SRC css
+ul:first-of-type li:nth-last-child(1) {
+   font-weight: bold;   
+}
+#+END_SRC
+
+#+BEGIN_SRC html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>CSS Selectors</title>
+    <style>
+       ul:first-of-type > li:nth-child(2) {
+         font-weight: bold;
+       }
+    </style>
+</head>
+<body>
+
+<div>
+   <p> My paragraph here. </p>
+   <ul>
+      <li> List Item 1</li>
+      <li> List Item 2</li>
+   </ul>
+
+   <ul>
+      <li> List Item 3</li>
+      <li> List Item 4</li>
+   </ul>   
+</div>
+
+</body>
+</html>
+
+#+END_SRC
+
+

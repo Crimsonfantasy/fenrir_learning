@@ -1,0 +1,12 @@
+* pip offfline install
+ 1. cp pip_offline
+ 2. pip download -r ../requirements.txt  
+ 3. cd ..
+ 4. pip install --no-index --find-links=file:/pip_offline -r requirements.txt 
+
+* 更新本地端的request.txt, 僅包含project dependencies lib
+ 1. pip install pipreqs
+ 2. pipreqs ${path_to_project}
+因為用pip freeze會把python環境中的所有third party lib都匯出, 因此需要用pipreqs
+* 列出python本機環境中的所有third party libs
+ 1. python freeze 

@@ -1,0 +1,10 @@
+#+TITLE: Reload
+* Nginx config reload without downtime
+Run service nginx reload or /etc/init.d/nginx reload
+It will do a hot reload of the configuration without downtime.
+If you have =pending= requests, then there will be =lingering= nginx processes that will handle those connections before it dies, so it's an extremely graceful way to reload configs.
+Sometimes you may want to prepend with sudo
+** checking whether existing  pending tcp clients:
+#+BEGIN_SRC shell
+sudo netstat -apn  | grep PEND
+#+END_SRC

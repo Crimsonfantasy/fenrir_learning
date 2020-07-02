@@ -27,10 +27,13 @@ https://www.emacswiki.org/emacs/GotoLastChange
 1. [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Create-Tags-Table.html][etag usage]]
 2. M-.
 
-
-* bebug key
+* debug key
 https://www.gnu.org/software/emacs/manual/html_node/emacs/Commands-of-GUD.html
 
 ** C-x C-a C-b=> Set a breakpoint on the source line that point is on.
 i prefer use  in  IntellJ=> C-S-a  C-b
 
+
+* Editor:
+** Extend selection(C-=):
+選擇批配下一個block
