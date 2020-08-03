@@ -1,0 +1,48 @@
+#+TITLE: Dnf
+* find rpm package contain source
+#+BEGIN_SRC shell
+dnf -s repoquery  bison-devel
+#+END_SRC
+
+* rebuild rpm package :rpm_rebuild:
+You can download sources with
+#+BEGIN_SRC shell
+dnf download --source somepackage
+#+END_SRC
+So for boost this would be:
+#+BEGIN_SRC shell
+dnf download --source boost
+#+END_SRC
+Also passing boost-devel like this should work even if the source package name is just boost, because dnf seems able to resolve it back correctly:
+#+BEGIN_SRC shell
+dnf download --source boost-devel
+#+END_SRC
+Either of these commands should fetch you an src.rpm file. This is a special kind of archive from which fedora packaging tools can produce the binary rpm files that you would normally download when installing software with dnf. To unpack one of these, you run something like this as your normal user:
+(這步驟看起來是安裝, 其實是解包rpm, 把source code拿出來)
+#+BEGIN_SRC
+rpm -ivh boost-1.60.0-10.fc25.src.rpm
+#+END_SRC
+This should produce you files in your
+#+BEGIN_QUOTE
+~/rpmbuild/ directory.
+#+END_QUOTE
+The =upstream source package= should be in
+#+BEGIN_QUOTE
+~/rpmbuild/SOURCES
+#+END_QUOTE
+directory. You can unpack it manually, or you can do that and apply the patches that fedora has (if any) by going to ~/rpmbuild/SPECS/ directory and running this:
+檢查相依是否滿足
+#+BEGIN_SRC shell
+rpmbuild -bp boost.spec
+#+END_SRC
+see: http://ftp.rpm.org/max-rpm/ch-rpm-b-command.html
+執行 %prep, %build, %install, %check,
+#+BEGIN_SRC shell
+rpmbuild -bb boost.spec
+#+END_SRC
+If you do not yet have rpmbuild installed, it is in the rpm-build package.
+Comments
+The =rpmbuild= may complain about =missing build dependencies=. This can be resolved using:
+#+BEGIN_SRC shell
+sudo dnf builddep  boost.spec
+#+END_SRC

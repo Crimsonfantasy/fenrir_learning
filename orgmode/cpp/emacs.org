@@ -1,0 +1,19 @@
+* toggle break point
+** doom Emacs's default setting:
+- enter gdb mode
+  #+BEGIN_SRC shell
+gdb
+  #+END_SRC
+- command:
+  in your =gdb-mi= ui (you current in thd gdb/gud mode), open the source code:
+ #+BEGIN_SRC shell
+  gud-break
+ #+END_SRC
+* 在根目錄中產生clang format 的code style, emacs's ls server clangd 會知道它並進行排版
+[[https://hsins.github.io/blog/2019/05/27/format-source-code-with-clang-format/][info of clang format from blog]]
+#+BEGIN_SRC shell
+clang-format -style=llvm -dump-config > .clang-format
+#+END_SRC
+* 想要直接跳到/xx/xxx/xxx/file_name:80:3的位置
+You can add this functionality to =find-file-at-point= with the following elisp snippet in your init file.
+然後,在buffer內的文字中使用find-file-at-point

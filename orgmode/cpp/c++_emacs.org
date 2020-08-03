@@ -1,0 +1,53 @@
+#+TITLE: C Emacs
+
+* CCLS 設定： :ccls:
+** 如何設定.ccls file
+https://github.com/MaskRay/ccls/wiki/Project-Setup#ccls-file
+
+** Auto generator: There are many ways to generate one. I use CMake or bear:
+Configure
+Project compile settings
+By default, a set of default compile settings are defined in +cc-default-compiler-options for C, C and Objective C. Irony, rtags and flycheck will fall back to these.
+To make these tools aware of project specific build settings, you need a JSON compilation database present (i.e. a compile_commands.json file).
+
+# For CMake projects
+#+BEGIN_SRC shell
+cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON .
+#+END_SRC
+
+# For non-CMake projects
+#+BEGIN_SRC shell
+make clean
+bear make
+
+#+END_SRC
+
+Use M-x +cc/reload-compile-db to reload your compile db in an already-open C/C++/ObjC buffer.
+** flycheck 無緣無故出現file not found :flycheck:
+因為flycheck不懂cmake, or make file, 所以要自己定義
+*** [X] 創建file .dir-locals.el 在根目錄
+*** 使用projectile的root定義, 並加入flycheck 的 include src讓
+
+#+BEGIN_SRC lisp
+;; (setq-local company-clang-arguments
+;;             (list (concat "-I" root "headers")
+;;                   (concat "-I" root "source/mon")))
+(let ((root (projectile-project-root)))
+  (setq-local flycheck-clang-include-path
+              (list (concat root "lib")
+                    (list (concat root "src")
+                    )))
+#+END_SRC
+
+* 不好用
+** ++ｒｔａｇｓ++
+*** install irony server:
+
+#+BEGIN_SRC shell
+dnf install llvm-devel
+dnf install llvm
+#+END_SRC
+in emacs: 
+#+BEGIN_SRC
+M^x irony-install-server
+#+END_SRC

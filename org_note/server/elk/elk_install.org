@@ -1,0 +1,131 @@
+* introduce
+In this guide, we will cover the installation of Elasticsearch 7.x/6.x on Fedora 32/31/30/29. Elasticsearch is a highly scalable open-source analytics engine and full-text search. With Elasticsearch, you can store, search, and analyze big volumes of data faster and in near real-time.
+
+
+Follow the steps provided in this article to have a working installation of Elasticsearch 7/6 on Fedora 32/31/30/29.
+
+For multi-node cluster, refer to Setup Elasticsearch Cluster on CentOS | Ubuntu With Ansible
+
+* install java
+Step 1: Install Java on Fedora.
+Elasticsearch depends on Java, you need it installed on your machine prior to installing Elasticsearch on Fedora. Default upstream version of OpenJDK can be installed on Fedora by running the commands:
+
+--- Fedora 32/31 ---
+$ sudo dnf install java-latest-openjdk
+
+-- Older Fedora ---
+$ sudo dnf -y install java-openjdk-devel java-openjdk
+After the installation of Java, you can quickly confirm the version using the following command:
+openjdk version "14" 2020-03-17
+OpenJDK Runtime Environment 19.9 (build 14+36)
+OpenJDK 64-Bit Server VM 19.9 (build 14+36, mixed mode, sharing)
+
+$ java -version
+java version "11.0.1" 2018-10-16 LTS
+Java(TM) SE Runtime Environment 18.9 (build 11.0.1+13-LTS)
+Java HotSpot(TM) 64-Bit Server VM 18.9 (build 11.0.1+13-LTS, mixed mode)
+Step 2: Add Elasticsearch Repository to Fedora
+After installing Java JDK, add Elasticsearch repository to your Fedora system.
+
+* For Elasticsearch 7.x
+** Import GPG Key
+
+sudo rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
+2. Add Repository
+
+#+BEGIN_SRC shell
+cat <<EOF | sudo tee /etc/yum.repos.d/elasticsearch.repo
+[elasticsearch-7.x]
+name=Elasticsearch repository for 7.x packages
+baseurl=https://artifacts.elastic.co/packages/oss-7.x/yum
+gpgcheck=1
+gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
+enabled=1
+autorefresh=1
+type=rpm-md
+EOF
+#+END_SRC
+** Install Elasticsearch on Fedora 32/31/30/29/28
+
+Elasticsearch repository is ready for use. You can install Elasticsearch using the command below:
+
+#+BEGIN_SRC  shell
+sudo dnf install elasticsearch-oss
+Hit the y key to start installation of Elasticsearch on Fedora 32/31/30/29:
+
+Dependencies resolved.
+========================================================================
+ Package              Arch      Version      Repository            Size
+========================================================================
+Installing:
+ elasticsearch-oss    x86_64    7.6.2-1      elasticsearch-7.x    211 M
+
+Transaction Summary
+========================================================================
+Install  1 Package
+
+Total download size: 211 M
+Installed size: 379 M
+Is this ok [y/N]: y
+
+#+END_SRC
+
+** sudo vi /etc/elasticsearch/jvm.options
+JVM options like memory limits are set on /etc/elasticsearch/jvm.options
+Start and enable elasticsearch service on boot:
+
+** sudo systemctl start elasticsearch
+** sudo systemctl enable elasticsearch
+Check status:
+
+** systemctl status elasticsearch
+● elasticsearch.service - Elasticsearch
+Loaded: loaded (/usr/lib/systemd/system/elasticsearch.service; disabled; vendor preset: disabled)
+Active: active (running) since Fri 2020-05-01 18:25:35 UTC; 13s ago
+Docs: http://www.elastic.co
+Main PID: 10229 (java)
+Tasks: 46 (limit: 2337)
+Memory: 1.1G
+CPU: 10.963s
+CGroup: /system.slice/elasticsearch.service
+└─10229 /usr/share/elasticsearch/jdk/bin/java -Des.networkaddress.cache.ttl=60 -Des.networkaddress.cache.negative.ttl=10 -XX:+AlwaysPreTou>
+May 01 18:25:21 fed32.novalocal systemd[1]: Starting Elasticsearch…
+May 01 18:25:22 fed32.novalocal elasticsearch[10229]: OpenJDK 64-Bit Server VM warning: Option UseConcMarkSweepGC was deprecated in version 9.0 and wil>
+May 01 18:25:35 fed32.novalocal systemd[1]: Started Elasticsearch.
+Test to verify that it is working:
+
+** curl http://127.0.0.1:9200
+{
+  "name" : "fed32.novalocal",
+  "cluster_name" : "elasticsearch",
+  "cluster_uuid" : "p44JohgqQcuwJj0iADuLiw",
+  "version" : {
+    "number" : "7.6.2",
+    "build_flavor" : "oss",
+    "build_type" : "rpm",
+    "build_hash" : "ef48eb35cf30adf4db14086e8aabd07ef6fb113f",
+    "build_date" : "2020-03-26T06:34:37.794943Z",
+    "build_snapshot" : false,
+    "lucene_version" : "8.4.0",
+    "minimum_wire_compatibility_version" : "6.8.0",
+    "minimum_index_compatibility_version" : "6.0.0-beta1"
+  },
+  "tagline" : "You Know, for Search"
+}
+* Install Kibana on Fedora 32/31/30/29/28.
+Kibana lets you visualize your Elasticsearch data and navigate the Elastic Stack. Install it after adding the repository using the command:
+
+** sudo dnf install -y kibana-oss
+After a successful installation, configure Kibana
+
+** sudo vi /etc/kibana/kibana.yml
+=server.host: "0.0.0.0"=
+=server.name: "kibana.example.com"=
+=elasticsearch.url: "http://localhost:9200"=
+Change other settings as desired then start Kibana service:
+** sudo systemctl enable --now kibana
+Access http://ip-address:5601 to open Kibana Dashboard:
+If you have an active firewall, you’ll need to allow access to Kibana port:
+sudo firewall-cmd --add-port=5601/tcp --permanent
+** sudo firewall-cmd --reload
+Reference courses:

@@ -1,0 +1,329 @@
+* 摘要：
+DBus作為一個輕量級的IPC被越來越多的平臺接受，在MeeGo中DBus也是主要的程序間通訊方式，這個筆記將從基本概念開始記錄筆者學習DBus的過程
+DBus是一種IPC機制，由freedesktop.org專案提供，使用GPL許可證發行，用於程序間通訊或程序與核心的通訊。
+注：Linux中的IPC通訊機制還包括，管道（fifo），共享記憶體，訊號量，訊息佇列，Socket等。
+DBus程序間通訊主要有三層架構：
+1. 底層介面層：主要是通過libdbus這個函式庫，給予系統使用DBus的能力。
+2. 匯流排層：主要Message busdaemon這個匯流排守護程序提供的，在Linux系統啟動時執行，負責程序間的訊息路由和傳遞，其中包括Linux核心和Linux桌面環境的訊息傳遞。匯流排守護程序可同時與多個應用程式相連，並能把來自一個應用程式的訊息路由到0或者多個其他程式。
+3.應用封裝層：通過一系列基於特定應用程式框架將DBus的底層介面封裝成友好的Wrapper庫，供不同開發人員使用
+
+[[https://www.evernote.com/shard/s654/nl/124363442/5b2703e2-5ad8-4308-b622-d2ad66e7b850?title=Untitled]]
+
+如上圖所示，Bus Daemon Process是執行在linux系統中的一個後臺守護程序，dbus-daemon執行時會呼叫libdus的庫。
+Application Process1代表的就是應用程式程序，通過呼叫特定的應用程式框架的Wrapper庫與dbus-daemon進行通訊。
+從上圖也可以看出來Application和Daemon中其實還是通過socket進行通行。
+
+DBus的三大優點：低延遲，低開銷，高可用性。
+
+ - 低延遲：DBus一開始就是用來設計成避免來回傳遞和允許非同步操作的。因此雖然在Application和Daemon之間是通過socket實現的，但是又去掉了socket的迴圈等待，保證了操作的實時高效。
+
+ - 低開銷：DBus使用一個二進位制的協議，不需要轉化成像XML這樣的文字格式。因為DBus是主要用來機器內部的IPC,而不是為了網路上的IPC機制而準備的.所以它才能夠在本機內部達到最優效果。
+
+ - 高可用性：DBus是基於訊息機制而不是位元組流機制。它能自動管理一大堆困難的IPC問題。同樣的，DBus庫被設計來讓程式設計師能夠使用他們已經寫好的程式碼。而不會讓他們放棄已經寫好的程式碼，被迫通過學習新的IPC機制來根據新的IPC特性重寫這些程式碼。
+
+在介紹基本概念之前，先介紹一個學習DBus的好工具d-feet，這個工具主要是用來檢視DBus的System Bus和Session Bus中的各個訊息連線的。當然，你也可以在這裡面新增自己建立的訊息匯流排，以便於觀察。
+
+
+
+下面根據上圖介紹一下DBus中的一些基本概念。
+
+會話匯流排（Session Buses）普通程序建立，可同時存在多條。會話匯流排屬於某個程序私有，它用於程序間傳遞訊息。
+
+系統匯流排（System Bus）在引導時就會啟動，它由作業系統和後臺程序使用，安全性非常好，以使得任意的應用程式不能欺騙系統事件。當然，如果一個應用程式需要接受來自系統匯流排的訊息，他也可以直接連線到系統匯流排中，但是他能傳送的訊息是受限的。
+
+Bus Name按字面理解為匯流排名稱貌似不是很貼切，應該是一個連線名稱，主要是用來標識一個應用和訊息匯流排的連線。從上圖可以看出來，匯流排名稱主要分為兩類
+
+"org.kde.StatusNotifierWatcher"這種形式的稱為公共名（well-knownname）
+
+** :1.3 這種形式的稱為唯一名（Unique Name）
+
+公共名提供眾所周知的服務。其他應用通過這個名稱來使用名稱對應的服務。可能有多個連線要求提供同個公共名的服務，即多個應用連線到訊息匯流排，要求提供同個公共名的服務。訊息匯流排會把這些連線排在連結串列中，並選擇一個連線提供公共名代表的服務。可以說這個提供服務的連線擁有了這個公共名。如果這個連線退出了，訊息匯流排會從連結串列中選擇下一個連線提供服務。
+
+唯一名以“:”開頭，“:”後面通常是圓點分隔的兩個數字，例如“:1.0”。每個連線都有一個唯一名。在一個訊息匯流排的生命期內，不會有兩個連線有相同的唯一名。擁有公眾名的連線同樣有唯一名，例如在前面的圖中，“org.kde.StatusNotifierWatcher”的唯一名是“:1.51”。
+
+每個連線都有一個唯一名，但不一定有公共名。
+
+只有唯一名而沒有公共名叫做私有連線，因為它們沒有提供可以通過公共名訪問的服務。
+
+** Object Paths
+“org.kde.StatusNotifierWatcher”這個連線中有三個Object Paths，標識這這個連線中提供了三個不同的服務，每個Object Paths表示一個服務。這個路徑在連線中是唯一的。
+*** Interfaces
+
+在每個Object Paths下都包含有多個介面（Interfaces），舉例如下介面：
+
+org.freedesktop.DBus.Introspectable
+
+org.freedesktop.DBus.Properties
+
+org.kde.StatusNotifierWatcher
+
+紅色的兩個是訊息匯流排提供的標準介面，而剩下的一個是需要具體的應用去實現的。
+
+*** Methods和Signals
+
+Methods表示可以被具體呼叫的方法
+
+Signals則表示的是訊號，此訊號可以被廣播，而連線了這個訊號的物件在接收到訊號時就可以進行相應的處理。和Qt中的訊號應該是一個意思。
+
+* D-BUS 基礎
+有很多種IPC或者網路通訊系統，如：CORBA, DCE, DCOM, DCOP, XML-RPC, SOAP, MBUS, Internet Communications Engine (ICE)等等，可能會有數百種，dbus的目的主要是下面兩點：
+
+1. 在同一個桌面會話中，進行桌面應用程式之間的通訊
+2. 桌面程式與核心或者守護程序的通訊。
+
+Dbus是一套程序通訊體系，它有以下幾層：
+1. ibdbus庫，提供給各個應用程式呼叫，使應用程式具有通訊和資料交換的能力，兩個應用程式可以直接進行通訊，就像是一條socket通道，兩個程式之間建立通道之後，就可以通訊了。
+2. 訊息守護程序，在libdbus的基礎上建立，可以管理多個應用程式之間的通訊。每個應用程式都和訊息守護程序建立dbus的連結，然後由訊息守護程序進行訊息的分派。
+3. 各種包裝庫，有libdbus-glib，libdbus-qt等等，目的是將dbus的底層api進行一下封裝。
+
+下面有一張圖可以很方便說明dbus的體系結構。
+dbus中的訊息由一個訊息頭（標識是哪一種訊息）和訊息資料組成，比socket的流式資料更方便一些。bus daemon 就像是一個路由器，與各個應用程式進行連線，分派這些訊息。bus daemon 在一臺機器上有多個例項，第一個例項是全域性的例項，類似於sendmail和或者apache，這個例項有很嚴格的安全限制，只接受一些特定的系統訊息， 用於系統通訊。其他bus daemon是一些會話，用於使用者登入之後，在當前會話(session)中進行的通訊。系統的bus daemon 和會話的bus daemon 是分開的，彼此不會互相影響，會話bus daemon 不會去呼叫系統的bus daemon 。
+
+** Native Objects and Object Paths
+在不同的程式語言中，都定義了一些“物件”，如java中的java.lang.Object，GLIB中的GObject，QT中的QObject等 等。D-BUS的底層介面，和libdbus API相關，
+=是沒有這些物件的概念的，它提供的是一種叫物件路徑 (object path)= ，用於讓高層介面繫結到各個物件中去，允許遠端應用程式指向它們。object path就像是一個檔案路徑，可以叫做/org/kde/kspread/sheets/3/cells/4/5等。
+
+** Methods and Signals
+每個物件都有一些成員，兩種成員:方法(methods)和訊號(signals)，在物件中，方法可以被呼叫。訊號會被廣播，感興趣的物件可以處理這個 訊號，同時訊號中也可以帶有相關的資料。
+每一個方法或者訊號都可以用一個名字來命名，如”Frobate” 或者 “OnClicked”。
+
+** Interfaces
+每個物件都有一個或者多個介面，一個介面就是多個方法和訊號的集合。dbus使用簡單的名稱空間字串來表示介面，如org.freedesktop.Introspectable。可以說dbus介面相當於C++中的純虛類。
+
+** Proxies
+代理物件用於模擬在另外的程序中的遠端物件，代理物件像是一個正常的普通物件。d-bus的底層介面必須手動建立方法呼叫的訊息，然後傳送，同時必須手動 接受和處理返回的訊息。高層介面可以使用代理來替換這些，當呼叫代理物件的方法時，代理內部會轉換成dbus的方法呼叫，等待訊息返回，對返回結果解包， 返回給相應的方法。可以看看下面的例子，使用dbus底層介面編寫的程式碼：
+#+BEGIN_SRC  java
+Message message = new Message("/remote/object/path", "MethodName", arg1, arg2);
+Connection connection = getBusConnection();
+connection.send(message);
+Message reply = connection.waitForReply(message);
+if (reply.isError()) {
+
+} else {
+Object returnValue = reply.getReturnValue();
+}
+#+END_SRC
+
+使用代理物件編寫的程式碼：
+#+BEGIN_SRC java
+Proxy proxy = new Proxy(getBusConnection(), "/remote/object/path");
+Object returnValue = proxy.MethodName(arg1, arg2);
+
+#+END_SRC
+客戶端程式碼減少很多。
+
+** Bus Names
+當一個應用程式連線上bus daemon時，daemon會分配一個唯一的名字給它。以 =冒號（:）開始= ，這些名字在daemon的生命週期中是不會改變的，可以認為這些名字就是一個 IP地址。當這個名字對映到應用程式的連線上時，應用程式可以說擁有這個名字。同時應用可以宣告額外的容易理解的名字，比如可以取一個名字 com.mycompany.TextEditor，可以認為這些名字就是一個域名。其他應用程式可以往這個名字傳送訊息，執行各種方法。
+
+名字還有第二個重要的用途，可以用於跟 =蹤應用程式的生命週期。= 當應用退出（或者崩潰）時，與bus的連線將被OS核心關掉，bus將會發送通知，告訴剩餘的應用程式，該程式已經丟失了它的名字。名字還可以檢測應用是否已經啟動，這往往用於只能啟動一個例項的應用。
+
+** Addresses
+使用d-bus的應用程式既可以是server也可以是client，server監聽到來的連線，client連線到server，一旦連線建立，訊息 就可以流轉。如果使用dbus daemon，所有的應用程式都是client，daemon監聽所有的連線，應用程式初始化連線到daemon。
+dbus地址指明server將要監聽的地方，client將要連線的地方，例如，地址：unix:path=/tmp/abcdef表明 server將在/tmp/abcdef路徑下監聽unix域的socket，
+client也將連線到這個socket。一個地址也可以指明是 TCP/IP的socket，或者是其他的。
+當使用bus daemon時，libdbus會從環境變數中（DBUS_SESSION_BUS_ADDRESS）自動認識“會話daemon”的地址。如果是系統 daemon，它會檢查指定的socket路徑獲得地址，也可以使用環境變數（DBUS_SESSION_BUS_ADDRESS）進行設定。
+當dbus中不使用daemon時，需要定義哪一個應用是server，哪一個應用是client，同時要指明server的地址，這不是很通常的做法。
+
+* Big Conceptual Picture
+要在指定的物件中呼叫指定的方法，需要知道的引數如下：
+Address -> [Bus Name] -> Path -> Interface -> Method
+bus name是可選的，除非是希望把訊息送到特定的應用中才需要。interface也是可選的，有一些歷史原因，DCOP不需要指定介面，因為DCOP在同一個物件中禁止同名的方法。
+
+Messages - Behind the Scenes
+如果使用dbus的高層介面，就可以不用直接操作這些訊息。DBUS有四種類型的訊息：
+1. 方法呼叫（method call） 在物件上執行一個方法
+2. 方法返回（method return）返回方法執行的結果
+3. 錯誤（error）呼叫方法產生的異常
+4. 訊號（signal）通知指定的訊號發生了，可以想象成“事件”。
+
+要執行 D-BUS 物件的方法，需要向物件傳送一個方法呼叫訊息。它將完成一些處理並返回一個方法返回訊息或者錯誤訊息。訊號的不同之處在於它們不返回任何內容：既沒有“訊號返回”訊息，也沒有任何型別的錯誤訊息。
+
+每個訊息都有一個訊息頭，包含多個欄位，有一個訊息體，包含多個引數。可以認為訊息頭是訊息的路由資訊，訊息體作為一個載體。訊息頭裡面的欄位包含 傳送的bus name，目標bus name，方法或者訊號名字等，同時訊息頭裡面定義的欄位型別規定了訊息體裡面的資料格式。例如：字元“i”代表了”32-bit integer”，“ii”就代表了訊息體裡面有兩個”32-bit integer”。
+
+Calling a Method - Behind the Scenes
+在dbus中呼叫一個方法包含了兩條訊息，程序A向程序B傳送方法呼叫訊息，程序B向程序A傳送應答訊息。所有的訊息都由daemon進行分派，每個呼叫 的訊息都有一個不同的序列號，返回訊息包含這個序列號，以方便呼叫者匹配呼叫訊息與應答訊息。呼叫訊息包含一些引數，應答訊息可能包含錯誤標識，或者包含 方法的返回資料。
+
+方法呼叫的一般流程：
+1. 使用不同語言繫結的dbus高層介面，都提供了一些代理物件，呼叫其他程序裡面的遠端物件就像是在本地程序中的呼叫一樣。應用呼叫代理上的方法，代理將構造一個方法呼叫訊息給遠端的程序。
+2. 在DBUS的底層介面中，應用需要自己構造方法呼叫訊息（method call message），而不能使用代理。
+3. 方法呼叫訊息裡面的內容有：目的程序的bus name，方法的名字，方法的引數，目的程序的物件路徑，以及可選的介面名稱。
+4. 方法呼叫訊息是傳送到bus daemon中的。
+5. bus daemon查詢目標的bus name，如果找到，就把這個方法傳送到該程序中，否則，daemon會產生錯誤訊息，作為應答訊息給傳送程序。
+6 .目標程序解開訊息，在dbus底層介面中，會立即呼叫方法，然後傳送方法的應答訊息給daemon。在dbus高層介面中，會先檢測物件路徑，介面， 方法名稱，然後把它轉換成對應的物件（如GObject，QT中的QObject等）的方法，然後再將應答結果轉換成應答訊息發給daemon。
+7. bus daemon接受到應答訊息，將把應答訊息直接發給發出呼叫訊息的程序。
+8. 應答訊息中可以包容很多返回值，也可以標識一個錯誤發生，當使用繫結時，應答訊息將轉換為代理物件的返回值，或者進入異常。
+
+bus daemon不對訊息重新排序，如果傳送了兩條訊息到同一個程序，他們將按照發送順序接受到。接受程序並需要按照順序發出應答訊息，例如在多執行緒中處理這些訊息，應答訊息的發出是沒有順序的。訊息都有一個序列號可以與應答訊息進行配對。
+
+** Emitting a Signal - Behind the Scenes
+在dbus中一個訊號包含一條訊號訊息，一個程序發給多個程序。也就是說，訊號是單向的廣播。訊號可以包含一些引數，但是作為廣播，它是沒有返回值的。
+
+訊號觸發者是不瞭解訊號接受者的，接受者向daemon註冊感興趣的訊號，註冊規則是”match rules”，記錄觸發者名字和訊號名字。daemon只向註冊了這個訊號的程序傳送訊號。
+
+訊號的一般流程如下：
+1. 當使用dbus底層介面時，訊號需要應用自己建立和傳送到daemon，使用dbus高層介面時，可以使用相關物件進行傳送，如Glib裡面提供的訊號觸發機制。
+2. 訊號包含的內容有：訊號的介面名稱，訊號名稱，傳送程序的bus name，以及其他引數。
+3. 任何程序都可以依據”match rules”註冊相關的訊號，daemon有一張註冊的列表。
+4. daemon檢測訊號，決定哪些程序對這個訊號感興趣，然後把訊號傳送給這些程序。
+5. 每個程序收到訊號後，如果是使用了dbus高層介面，可以選擇觸發代理物件上的訊號。如果是dbus底層介面，需要檢查傳送者名稱和訊號名稱，然後決定怎麼做。
+
+* D-Bus的基本概念
+
+D-Bus是一個訊息匯流排系統，其功能已涵蓋程序間通訊的所有需求，並具備一些特殊的用途。D-Bus是三層架構的程序間通訊系統，其中包括：
+- 介面層：介面層由函式庫libdbus提供，程序可通過該庫使用D-Bus的能力。
+- 匯流排層：匯流排層實際上是由D-Bus匯流排守護程序提供的。它在Linux系統啟動時執行，負責程序間的訊息路由和傳遞，其中包括Linux核心和Linux桌面環境的訊息傳遞。
+- 包裝層：包裝層一系列基於特定應用程式框架的Wrapper庫。
+
+D-Bus具備自身的協議，協議基於二進位制資料設計，與資料結構和編碼方式無關。該協議無需對資料進行序列化，保證了資訊傳遞的高效性。無論是libdbus，還是D-Bus匯流排守護程序，均不需要太大的系統開銷。
+
+匯流排是D-Bus的程序間通訊機制，一個系統中通常存在多條匯流排，這些匯流排由D-Bus匯流排守護程序管理。最重要的匯流排為系統匯流排（System Bus），Linux核心引導時，該匯流排就已被裝入記憶體。只有Linux核心、Linux桌面環境和許可權較高的程式才能向該匯流排寫入訊息，以此保障系統安全性，防止有惡意程序假冒Linux傳送訊息。
+
+會話匯流排（Session Buses）由普通程序建立，可同時存在多條。會話匯流排屬於某個程序私有，它用於程序間傳遞訊息。
+
+程序必須註冊後才能收到匯流排中的訊息，並且可同時連線到多條匯流排中。D-Bus提供了匹配器（Matchers）使程序可以有選擇性的接收訊息，另外執行程序註冊回撥函式，在收到指定訊息時進行處理。匹配器的功能等同與路由，用於避免處理無關訊息造成程序的效能下降。除此以外，D-Bus機制的重要概念有以下幾個。
+
+- 物件：物件是封裝後的匹配器與回撥函式，它以對等（peer-to-peer）協議使每個訊息都有一個源地址和一個目的地址。這些地址又稱為物件路徑，或者稱之為匯流排名稱。物件的介面是回撥函式，它以類似C++的虛擬函式實現。當一個程序註冊到某個匯流排時，都要建立相應的訊息物件。
+
+- 訊息：D-Bus的訊息分為訊號（signals）、方法呼叫（method calls）、方法返回（method returns）和錯誤（errors）。訊號是最基本的訊息，註冊的程序可簡單地傳送訊號到總線上，其他程序通過匯流排讀取訊息。方法呼叫是通過匯流排傳遞引數，執行另一個程序介面函式的機制，用於某個程序控制另一個程序。方法返回是註冊的程序在收到相關資訊後，自動做出反應的機制，由回撥函式實現。錯誤是訊號的一種，是註冊程序錯誤處理機制之一。
+
+- 服務：服務（Services）是程序註冊的抽象。程序註冊某個地址後，即可獲得對應匯流排的服務。D-Bus提供了服務查詢介面，程序可通過該介面查詢某個服務是否存在。或者在服務結束時自動收到來自系統的訊息。
+
+** 建立服務的流程:
+----------------------------------
+    建立一個dbus連線之後 -- dbus_bus_get()，為這個dbus連線(DbusConnection)起名 -- dbus_bus_request_name()，這個名字將會成為我們在後續進行遠端呼叫的時候的服務名，然後我們進入監聽迴圈 -- dbus_connection_read_write()。在迴圈中，我們從總線上取出訊息 -- dbus_connection_pop_message()，並通過比對訊息中的方法介面名和方法名 -- dbus_message_is_method_call()，如果一致，那麼我們跳轉到相應的處理中去。在相應的處理中，我們會從訊息中取出遠端呼叫的引數。並且建立起回傳結果的通路 -- reply_to_method_call()。回傳動作本身等同於一次不需要等待結果的遠端呼叫。
+傳送訊號的流程:
+----------------------------------
+    建立一個dbus連線之後，為這個dbus連線起名，建立一個傳送訊號的通道，注意，在建立通道的函式中，需要我們填寫該訊號的介面名和訊號名 -- dbus_message_new_signal()。然後我們把訊號對應的相關引數壓進去 -- dbus_message_iter_init_append(); dbus_message_iter_append_basic()。然後就可以啟動傳送了 -- dbus_connection_send(); dbus_connection_flush。
+進行一次遠端呼叫的流程:
+----------------------------------
+    建立好dbus連線之後，為這dbus連線命名，申請一個遠端呼叫通道 -- dbus_message_new_method_call()，注意，在申請遠端呼叫通道的時候，需要填寫伺服器名，本次呼叫的介面名，和本次呼叫名(方法名)。壓入本次呼叫的引數 -- dbus_message_iter_init_append(); dbus_message_iter_append_basic()，實際上是申請了一個首地址，我們就是把我們真正要傳的引數，往這個首地址裡面送(送完之後一般都會判斷是否記憶體越界了)。然後就是啟動傳送呼叫並釋放傳送相關的訊息結構 -- dbus_connection_send_with_reply()。這個啟動函式中帶有一個控制代碼。我們馬上會阻塞等待這個控制代碼給我們帶回總線上回傳的訊息。當這個控制代碼回傳訊息之後，我們從訊息結構中分離出引數。用dbus提供的函式提取引數的型別和引數 -- dbus_message_iter_init(); dbus_message_iter_next(); dbus_message_iter_get_arg_type(); dbus_message_iter_get_basic()。也就達成了我們進行本次遠端呼叫的目的了。
+訊號接收流程:
+----------------------------------
+    建立一個dbus連線之後，為這個dbus連線起名，為我們將要進行的訊息迴圈新增匹配條件(就是通過訊號名和訊號介面名來進行匹配控制的) -- dbus_bus_add_match()。我們進入等待迴圈後，只需要對訊號名，訊號介面名進行判斷就可以分別處理各種訊號了。在各個處理分支上。我們可以分離出訊息中的引數。對引數型別進行判斷和其他的處理。
+
+* 訊息傳送程式
+
+"dbus-ding-send.c"程式每秒通過會話匯流排傳送一個引數為字串Ding!的訊號。該程式的原始碼如下：
+
+#+BEGIN_SRC c
+#include <glib.h>                               // 包含glib庫
+#include <dbus/dbus-glib.h>                     // 包含
+//glib庫中D-Bus管理庫
+#include <stdio.h>
+static gboolean send_ding(DBusConnection *bus);// 定義傳送訊息函式的原型
+int main ()
+{
+   GMainLoop *loop;                             // 定義一個事件迴圈物件的指標
+   DBusConnection *bus;                         // 定義匯流排連線物件的指標
+   DBusError error;                             // 定義D-Bus錯誤訊息物件
+   loop = g_main_loop_new(NULL, FALSE);         // 建立新事件迴圈物件
+   dbus_error_init (&error);                    // 將錯誤訊息物件連線到D-Bus
+                                                // 錯誤訊息物件
+   bus = dbus_bus_get(DBUS_BUS_SESSION, &error);// 連線到匯流排
+   if (!bus) {                              // 判斷是否連線錯誤
+g_warning("連線到D-Bus失敗: %s", error.message);
+                                        // 使用GLib輸出錯誤警告資訊
+      dbus_error_free(&error);              // 清除錯誤訊息
+      return 1;
+   }
+   dbus_connection_setup_with_g_main(bus, NULL);
+                                            // 將匯流排設為接收GLib事件迴圈
+   g_timeout_add(1000, (GSourceFunc)send_ding, bus);
+                                    // 每隔1000ms呼叫一次send_ding()函式
+                                            // 將匯流排指標作為引數
+   g_main_loop_run(loop);                   // 啟動事件迴圈
+   return 0;
+}
+static gboolean send_ding(DBusConnection *bus)  // 定義發送訊息函式的細節
+{
+   DBusMessage *message;                        // 建立訊息物件指標
+   message = dbus_message_new_signal("/com/burtonini/dbus/ding",
+                                       "com.burtonini.dbus.Signal",
+                                       "ding");     // 建立訊息物件並標識路徑
+   dbus_message_append_args(message,
+                            DBUS_TYPE_STRING, "ding!",
+                            DBUS_TYPE_INVALID);     //將字串Ding!定義為訊息
+   dbus_connection_send(bus, message, NULL);    // 傳送該訊息
+   dbus_message_unref(message);                 // 釋放訊息物件
+   g_print("ding!/n");                          // 該函式等同與標準輸入輸出
+   return TRUE;
+}
+#+END_SRC
+
+main()函式建立一個GLib事件迴圈，獲得會話匯流排的一個連線，並將D-Bus事件處理整合到GLib事件迴圈之中。然後它建立了一個名為send_ding()函式作為間隔為一秒的計時器，並啟動事件迴圈。send_ding()函式構造一個來自於物件路徑"/com/burtonini/dbus/ding"和介面"com.burtonini.dbus.Signal"的新的Ding訊號。然後，字串Ding!作為引數新增到訊號中並通過匯流排傳送。在標準輸出中會列印一條訊息以讓使用者知道傳送了一個訊號。
+
+2．訊息接收程式
+
+dbus-ding-listen.c程式通過會話匯流排接收dbus-ding-send.c程式傳送到訊息。該程式的原始碼如下：
+
+#+BEGIN_SRC c
+#include <glib.h>                               // 包含glib庫
+#include <dbus/dbus-glib.h>                     // 包含glib庫中D-Bus管理庫
+static DBusHandlerResult signal_filter      // 定義接收訊息函式的原型
+      (DBusConnection *connection, DBusMessage *message, void *user_data);
+int main()
+{
+   GMainLoop *loop;                             // 定義一個事件迴圈物件的指標
+   DBusConnection *bus;                         // 定義匯流排連線物件的指標
+   DBusError error;                             // 定義D-Bus錯誤訊息物件
+   loop = g_main_loop_new(NULL, FALSE);         // 建立新事件迴圈物件
+   dbus_error_init(&error);                     // 將錯誤訊息物件連線到D-Bus
+                                                // 錯誤訊息物件
+   bus = dbus_bus_get(DBUS_BUS_SESSION, &error);    // 連線到匯流排
+   if (!bus) {                              // 判斷是否連線錯誤
+g_warning("連線到D-Bus失敗: %s", error.message);
+                                        // 使用GLib輸出錯誤警告資訊
+      dbus_error_free(&error);              // 清除錯誤訊息
+      return 1;
+  }
+   dbus_connection_setup_with_g_main(bus, NULL);
+                                            // 將匯流排設為接收GLib事件迴圈
+   dbus_bus_add_match(bus, "type='signal',interface
+='com.burtonini.dbus.Signal'");  // 定義匹配器
+   dbus_connection_add_filter(bus, signal_filter, loop, NULL);
+                                            // 呼叫函式接收訊息
+   g_main_loop_run(loop);                   // 啟動事件迴圈
+   return 0;
+}
+static DBusHandlerResult                    // 定義接收訊息函式的細節
+signal_filter (DBusConnection *connection,
+DBusMessage *message, void *user_data)
+{
+   GMainLoop *loop = user_data;             // 定義事件迴圈物件的指標，並與主函式中的同步
+   if (dbus_message_is_signal               // 接收連線成功訊息，判斷是否連線失敗
+        (message, DBUS_INTERFACE_ORG_FREEDESKTOP_LOCAL,
+"Disconnected")) {
+      g_main_loop_quit (loop);              // 退出主迴圈
+      return DBUS_HANDLER_RESULT_HANDLED;
+   }
+   if (dbus_message_is_signal(message, "com.burtonini.dbus.Signal",
+   "Ping")) {
+                                            // 指定訊息物件路徑，判斷是否成功
+      DBusError error;                      // 定義錯誤物件
+      char *s;
+dbus_error_init(&error);                // 將錯誤訊息物件連線到D-Bus錯誤
+                                        // 訊息物件
+      if (dbus_message_get_args                 // 接收訊息，並判斷是否有錯誤
+         (message, &error, DBUS_TYPE_STRING, &s,
+DBUS_TYPE_INVALID)) {
+         g_print("接收到的訊息是: %s/n", s);   // 輸出接收到的訊息
+         dbus_free (s);                     // 清除該訊息
+      }
+      else {                                    // 有錯誤時執行下列語句
+         g_print("訊息已收到，但有錯誤提示: %s/n", error.message);
+         dbus_error_free (&error);
+      }
+      return DBUS_HANDLER_RESULT_HANDLED;
+   }
+   return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+}
+
+#+END_SRC
+
+該程式偵聽dbus-ping-send.c程式正在發出的訊號。main()函式和前面一樣啟動，建立一個到匯流排的連線。然後它宣告願意在使用com.burtonini.dbus.Signal介面的訊號被髮送時得到通知，將signal_filter()函式設定為通知函式，然後進入事件迴圈。當滿足匹配的訊息被髮送時，signal_func()函式會被呼叫。
+
+如果需要確定在接收訊息時如何處理，可通過檢測訊息頭實現。若收到的訊息為匯流排斷開訊號，則主事件迴圈將被終止，因為監聽的匯流排已經不存在了。若收到其他的訊息，首先將收到的訊息與期待的訊息進行比較，兩者相同則輸出其中引數，並退出程式。兩者不相同則告知匯流排並沒有處理該訊息，這樣訊息會繼續保留在匯流排中供別的程式處理。
+
+* 由d-feet觀察到的D-Bus世界
+[[https://www.evernote.com/shard/s654/res/51c0cdf5-1270-4fb8-a51a-32bdcab18331]]
+D-Bus是一個程式。它提供了API。但我們一般不會直接使用dbus的介面。dbus-glib是GTK版本的dbus介面封裝

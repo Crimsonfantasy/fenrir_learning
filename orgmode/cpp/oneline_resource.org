@@ -1,0 +1,3 @@
+#+TITLE: Oneline Resource
+* big picture
+[[https://isocpp.org/wiki/faq/big-picture][C++, the big picture]]

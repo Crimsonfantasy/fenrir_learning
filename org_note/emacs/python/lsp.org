@@ -1,0 +1,21 @@
+#+TITLE: Lsp
+
+* lsp-pyton-ms
+** Unresolved import warnings :lsp_python:
+If you're getting a warning about an unresolved import, first ensure that the package is installed into your environment if it is a library (pip, pipenv, etc). If the warning is about importing your own code (and not a library), continue reading.
+The language server treats the workspace root (i.e. folder you have opened) as the main root of user module imports. This means that if your imports are not relative to this path, the language server will not be able to find them. This is common for users who have a src directory which contains their code, a directory for an installable package, etc.
+These extra roots must be specified to the language server. The easiest way to do this (with the VS Code Python extension) is to create a workspace configuration which sets python.autoComplete.extraPaths. For example, if a project uses a src directory, then create a file .vscode/settings.json in the workspace with the contents:
+#+BEGIN_SRC JSON
+{
+    "python.autoComplete.extraPaths": ["./src"]
+}
+
+#+END_SRC
+=issue on 20200714==
+This list can be extended to other paths within the workspace (or even with code outside the workspace in more complicated setups). Relative paths will be taken as relative to the workspace root.
+This list may also be configured using the PYTHONPATH environment variable, either set directly, or via a .env file in the workspace root (if using the Python extension):
+
+#+BEGIN_SRC 
+PYTHONPATH=./src
+#+END_SRC
+[[https://github.com/microsoft/python-language-server/blob/master/TROUBLESHOOTING.md#unresolved-import-warnings][see on it]]

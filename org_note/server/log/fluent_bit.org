@@ -1,0 +1,3 @@
+#+TITLE: Fluent Bit
+* build fluent bit
+** dnf install flex-devel bison-devel

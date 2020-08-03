@@ -1,0 +1,9 @@
+#+TITLE: Find
+* 列出資料夾的總大小, 不是資料夾則列出檔案總大小 :find_command:
+#+BEGIN_SRC shell
+find ./ -type f  -mtime  -1 -print0 | du -ch --files0-from=-
+#+END_SRC
+* How to find files not matching a pattern
+#+BEGIN_SRC shell
+find ./ ! -name $match_file
+#+END_SRC

@@ -1,0 +1,42 @@
+
+* Discussion => *.h or *.hpp for your class definitions?:cpp_header:
+
+#+BEGIN_QUOTE text
+Here are a couple of reasons for having different naming of C vs C++ headers:
+
+Automatic code formatting, you might have different guidelines for formatting C and C++ code. If the headers are separated by extension you can set your editor to apply the appropriate formatting automatically
+Naming, I've been on projects where there were libraries written in C and then wrappers had been implemented in C++. Since the headers usually had similar names, i.e. Feature.h vs Feature.hpp, they were easy to tell apart.
+Inclusion, maybe your project has more appropriate versions available written in C++ but you are using the C version (see above point). If headers are named after the language they are implemented in you can easily spot all the C-headers and check for C++ versions.
+Remember, C is not C++ and it can be very dangerous to mix and match unless you know what you are doing. Naming your sources appropriately helps you tell the languages apart.
+#+END_QUOTE
+
+#+BEGIN_QUOTE
+By one convention, .hpp files are used when the prototypes are defined in the header itself. Such definitions in headers are useful in case of templates, since the compiler generates the code for each type only on template instantiation. Hence, if they are not defined in header files, their definitions will not be resolved at link time from other compilation units. If your project is a C++ only project that makes heavy use of templates, this convention will be useful.
+
+Certain template libraries that adhere to this convention provide headers with .hpp extensions to indicate that they do not have corresponding .cpp files.
+
+another convention is to use .h for C headers and .hpp for C++; a good example would be the boost library.
+
+Quote from Boost FAQ,
+
+---------------------------
+File extensions communicate the "type" of the file, both to humans and to computer programs. The '.h' extension is used for C header files, and therefore communicates the wrong thing about C++ header files. Using no extension communicates nothing and forces inspection of file contents to determine type. Using '.hpp' unambiguously identifies it as C++ header file, and works well in actual practice. (Rainer Deyke)
+---------------------------
+#+END_QUOTE
+
+#+BEGIN_QUOTE
+Bjarne Stroustrup(c++作者) and Herb Sutter have a statement to this question in their C++ Core guidelines found on: https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#S-source which is also refering to the latest changes in the standard extension (C++11, C++14, etc.)
+
+------------------------------------------------
+SF.1: Use a .cpp suffix for code files and .h for interface files if your Y project doesn't already follow another convention Reason
+
+It's a longstanding convention. But consistency is more important, so if your project uses something else, follow that. Note
+
+This convention reflects a common use pattern: Headers are more often shared with C to compile as both C++ and C, which typically uses .h, and it's easier to name all headers .h instead of having different extensions for just those headers that are intended to be shared with C. On the other hand, implementation files are rarely shared with C and so should typically be distinguished from .c files, so it's normally best to name all C++ implementation files something else (such as .cpp).
+
+The specific names .h and .cpp are not required (just recommended as a default) and other names are in widespread use. Examples are .hh, .C, and .cxx. Use such names equivalently. In this document, we refer to .h and .cpp > as a shorthand for header and implementation files, even though the actual extension may be different.
+
+Your IDE (if you use one) may have strong opinions about suffices.
+------------------------------------------------
+I'm not a big fan of this convention because if you are using a popular library like boost, your consistency is already broken and you should better use .hpp.
+#+END_QUOTE

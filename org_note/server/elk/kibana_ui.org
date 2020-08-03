@@ -1,0 +1,7 @@
+#+TITLE: Kibana_ui
+* delete data of targets index pattern: :kibana_ui:
+[[https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-delete-index.html][see: delete index api]]
+if you have index pattern twitter, the command is :
+#+BEGIN_SRC shell
+DELETE /twitter
+#+END_SRC

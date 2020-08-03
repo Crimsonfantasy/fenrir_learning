@@ -1,0 +1,7 @@
+#+TITLE: Log
+* run single test
+[[https://www.boost.org/doc/libs/1_54_0/libs/test/doc/html/utf/user-guide/runtime-config/run-by-name.html][Running specific test units selected by their name]]
+for example:
+#+BEGIN_SRC shell
+./mashroon_test --run_test=g3log_test
+#+END_SRC

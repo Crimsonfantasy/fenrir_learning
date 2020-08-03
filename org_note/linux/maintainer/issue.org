@@ -1,0 +1,3 @@
+#+TITLE: Issue
+* It's really hard to find maintainers... :linux_maintainer:
+[[https://www.theregister.com/2020/06/30/hard_to_find_linux_maintainers_says_torvalds/][hard to find maintainer]]

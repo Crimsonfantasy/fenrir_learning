@@ -1,0 +1,14 @@
+#    -*- mode: org -*-
+
+
+Archived entries from file /home/fenrir/work/fenrir_learning/org_note/server/log/log_monitor.org
+
+
+* Better way to communicate with two Fluentd instances:
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2020-07-22 Wed 15:29
+  :ARCHIVE_FILE: ~/work/fenrir_learning/org_note/server/log/log_monitor.org
+  :ARCHIVE_CATEGORY: log_monitor
+  :END:
+But, we recommend to use in/out forward plugin to communicate with two Fluentd instances due to at-most-once and at-least-once semantics for rigidity.
+

@@ -1,0 +1,57 @@
+#+TITLE: Cmake
+* 如和給定 -std flag:
+因為-std的flag數值經常變動, 我們先參考llvm source code舉了那些alias name:
+[[https://github.com/llvm/llvm-project/blob/master/clang/include/clang/Basic/LangStandards.def][std_alias_name_in_llvm]]
+* CMAKE_CXX_FLAGS_DEBUG and CMAKE_CXX_FLAGS_RELEASE
+**  如果将优化程度调到最高需要设置参数-O3,最低是 -O0
+
+
+#+BEGIN_SRC cmake
+SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g -ggdb")
+SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
+#+END_SRC
+**
+* ccmake ui 工具幫助你設定flag
+[[https://www.ibm.com/developerworks/cn/linux/l-cn-cmake/index.html][可以參考ibm develop]]
+** 設定步驟
+1. 按照界面中的提示进行操作,按 "c" 进行 configure ,这时界面中显示出了配置变量 =CMAKE_BUILD_TYPE= 的条目。如下图所示：
+2. 将变量 CMAKE_BUILD_TYPE 设置为 =Debug= ,按 ="c"= 进行 configure
+3. =按 "g"= 生成 Makefile 并退出
+* Controlling Diagnostics via Pragmas
+** -Wall (gcc/clang), 推薦使用
+The pragma may control any warning that can be used from the command line. Warnings may be set to ignored, warning, error, or fatal. The following example code will tell Clang or GCC to ignore the -Wall warnings:
+* Option
+Provides an option that the user can optionally select.
+#+BEGIN_QUOTE cmake
+option(<option_variable> "help string describing option"
+       [initial value])
+#+END_QUOTE
+
+** example
+*** in cmake:
+#+BEGIN_SRC cmake
+option(BUILD_TESTS "Build test programs" OFF)
+option(BUILD_TESTS_2 "Build test programs" OFF)
+#+END_SRC
+
+*** Note that -Dxxxx  must come before the path, In command line:
+#+BEGIN_SRC shell
+cmake -DBUILD_TESTS=ON -DBUILD_TESTS_2=ON
+# or
+cmake -D DBUILD_TESTS_2=ON DBUILD_TESTS=ON
+#+END_SRC
+* FetchContent (import external cmake project from git)
+
+* resource
+** clang optional, 內容豐富
+[[https://clang.llvm.org/docs/UsersManual.html][clang user manuals]]
+
+
+* Tracing a run
+Have you wanted to watch exactly what happens in your CMake file, and when? The --trace-source="filename" feature is fantastic. Every line run in the file that you give will be echoed to the screen when it is run, letting you follow exactly what is happening. There are related options as well, but they tend to bury you in output.
+
+For example:
+#+BEGIN_SRC shell
+cmake -S . -B build --trace-source=CMakeLists.txt
+#+END_SRC
+If you add --trace-expand, the variables will be expanded into their values.

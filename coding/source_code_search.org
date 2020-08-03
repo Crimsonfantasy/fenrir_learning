@@ -1,0 +1,6 @@
+#+TITLE: Source_code_search
+
+* 大量參考前人的程式碼, 優質程式碼
+** Sourcegraph
+https://sourcegraph.com/search
+* https://stackoverflow.com/questions/15723061/how-to-check-if-interface-is-up

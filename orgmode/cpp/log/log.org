@@ -1,0 +1,6 @@
+#+TITLE: Log
+* 可用的log
+** g3log
+[[https://github.com/KjellKod/g3log][g3log in github]]
+1. It is CRASH SAFE.
+2. Easy to use, clean syntax.

@@ -1,0 +1,53 @@
+#+TITLE: Log_monitor
+* log monitor :flunetd:
+fluentd + elasticSearch
+* book
+https://www.manning.com/books/unified-logging-with-fluentd
+* fluentd install
+
+** If you need to compile gems C extensions, install  Ruby  header files with the following command:
+#+BEGIN_SRC shell
+sudo dnf install ruby-devel
+#+END_SRC
+
+
+** installed fluented bu gem
+#+BEGIN_SRC shell
+gem install fluentd --no-ri --no-rdoc
+#+END_SRC
+
+** Run
+Run the following commands to confirm that Fluentd was installed successfully:
+#+BEGIN_SRC shell
+fluentd --setup ./fluent
+fluentd -c ./fluent/fluent.conf -vv &
+echo '{"json":"message"}' | fluent-cat debug.test
+#+END_SRC
+
+** setup
+*** If you install Fluentd using the Ruby Gem,you can create the configuration file using the following commands:
+#+BEGIN_SRC shell
+sudo fluentd --setup /etc/fluent
+sudo vi /etc/fluent/fluent.conf
+#+END_SRC
+*** edit server config: emacs /etc/fluent
+* reload the config file
+Sending a SIGHUP signal will reload the config file.
+#+BEGIN_SRC shell
+kill -1  6459
+#+END_SRC
+* Regex 測試網站
+https://fluentular.herokuapp.com/
+
+** 會顯示match範圍的的網站
+[[https://regex101.com/r/ppQoIP/1/][regex101]] (fluentd的regex PCRE  版本, 也是php用)
+經常用的方法（?<tag>.*）: 這叫做capture groups
+
+* elasticsearch
+[[https://docs.fluentd.org/output/elasticsearch][official documents]]
+** install
+
+If you have installed =Fluentd= without =td-agent=, please install this plugin using fluent-gem:
+#+BEGIN_SRC shell
+fluent-gem install fluent-plugin-elasticsearch
+#+END_SRC

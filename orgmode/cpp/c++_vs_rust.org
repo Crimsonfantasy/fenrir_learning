@@ -1,0 +1,2 @@
+#+TITLE: C Vs Rust
+* [[https://www.viva64.com/en/b/0733/][編譯出來的組合語言作比較]]

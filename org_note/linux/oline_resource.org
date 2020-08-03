@@ -1,0 +1,46 @@
+#+TITLE: Oline_resource
+* Linux 相關資源
+有鑑於Linux相關的網路資源太多了，開個頁面來整理一下。
+* 鳥哥http://linux.vbird.org/
+- 鳥哥ㄟ，沒人不知道吧？台灣學Linux的入口，也是字典。
+
+* Linux Taiwan Calendar
+- 這個平台專門蒐集台灣的開放源碼活動(如右)。
+
+* Tecmint https://www.tecmint.com/
+- 這網站很常有整合性的文章可以學習。
+
+* Reddit Linux https://www.reddit.com/r/linux/
+- Reddit上的Linux主題。
+
+* commandlinefu http://www.commandlinefu.com/
+-這網站會有人分享自己的shell cmd，你可以看一下最多人用的是哪個。
+
+* free-electrons  https://bootlin.com/
+- 專門在做嵌入式Linux的教育機構，常常有很多不錯的文章。
+
+* How to Geek https://www.howtogeek.com/
+- 跟Linux沒有絕對關係，但是很常也有整合性的文章可以看。
+
+* Ubuntu正體中文論壇
+- 可以常常上去看人家問什麼問題，或者可以幫忙回答。
+
+* Linux Conferences
+底下收集一些相關的Linux大拜拜資料。
+
+DOSDEM
+2017
+  - https://review.video.fosdem.org/overview
+  - http://video.fosdem.org/2017/
+
+Linux Conf Australia
+2017
+  - http://free-electrons.com/blog/slides-video-lca-2017/
+
+Embedded-Linux-Conference
+2017
+  - http://elinux.org/ELC_2017_Presentations
+
+Embedded-Linux-Conference-Europe
+2016
+  - http://elinux.org/ELC_Europe_2016_Presentations

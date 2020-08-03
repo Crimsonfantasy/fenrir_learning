@@ -1,0 +1,3 @@
+#+TITLE: Code Style
+* google CPP code style:
+[[http://www.slmt.tw/google-cpp-style-guide-zh-tw/scoping/thread-local-variables.html][github中文版]]

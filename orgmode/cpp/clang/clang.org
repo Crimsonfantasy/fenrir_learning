@@ -1,0 +1,7 @@
+#+TITLE: Clang
+* Clang 和gcc 最大差別：
+Clang 實作的時候有先分析成ast (Abstract Syntax Tree), 在進行查找, 對IDE支援佳,
+
+值得注意的是：
+1. clang編譯c++的ast和c++程式碼本身敘述非常類似
+[[https://clang.llvm.org/docs/IntroductionToTheClangAST.html][clang ast official]]

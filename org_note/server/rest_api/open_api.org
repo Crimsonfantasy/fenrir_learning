@@ -1,0 +1,10 @@
+#+TITLE: Open Api
+* open api 2 html document: :open_api:
+A possible solution is to convert your OpenAPI 3.0 definition to an HTML doc, then use a browser's "Save to PDF" feature to convert HTML to PDF.
+Follow these steps:
+1. Go to https://editor.swagger.io.
+2. Paste your OpenAPI 3.0 YAML/JSON definition.
+3. Select Generate Client > html.
+4. Download & unzip the file.
+5. Open the index.html page in a browser, e.g. Chrome.
+6. Select File > Print, change the Destination to Save as PDF, and save the page.

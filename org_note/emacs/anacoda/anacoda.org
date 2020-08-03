@@ -1,0 +1,27 @@
+#+TITLE:
+* how to activate the ananconda's env python in emacs?
+You didn't seem to explain your self much so I'm going to try and guess what you want.
+You want to be able to switch conda python versions and conda virtual environments depending on what files you're editing. I recently set this up using the pyvenv package. In my config file I have:
+#+BEGIN_SRC elisp
+(use-package pyvenv
+        :ensure t
+        :init
+        (setenv "WORKON_HOME" "/home/NAME/anaconda/envs")
+        (pyvenv-mode 1)
+        (pyvenv-tracking-mode 1))
+
+#+END_SRC
+
+Change the "WORKON_HOME" directory to point to the directory with your virtual environments.
+Then in your project directory. Place a file called =.dir-locals.el= in that file place:
+#+BEGIN_SRC elisp
+((nil . ((pyvenv-workon . "ENV_NAME"))))
+#+END_SRC
+where ENV_NAME should be replaced by your virtual-environments name.
+Your project tree should look like:
+#+BEGIN_QUOTE
+-Project
+  -projectfile_1.py
+  -projectfile_2.py
+  -.dir-locals.el
+#+END_QUOTE
