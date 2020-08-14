@@ -1,0 +1,6 @@
+#+TITLE: Rtags
+* irony出現這種不預期的錯誤資訊： :irony:
+設定compile_command.json的路徑
+1. irony-cdb-json-add-compile-command-path
+2. 他不會創件p設定檔, 所以要自己先建立檔案 /home/fenrir/.doom.d/irony/cdb-json-projects
+3. 成功之後 c-x c-v reload buffer
