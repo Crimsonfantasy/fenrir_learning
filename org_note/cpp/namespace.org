@@ -1,0 +1,71 @@
+#+TITLE: Namespace
+
+* C++ namespaces with private members
+n C++ you can build beautiful namespaces with private members (variables and functions). This is a good choice when you want to hide the inner workings of a set of utility functions from the final user. You can accomplish that thanks to the concept of anonymous namespaces. An anonymous namespace is a namespace without name, like the following one:
+
+#+BEGIN_SRC c++
+ namespace
+{
+    // your stuff here
+}
+The beauty of anonymous namespaces is that they are available only in their translation unit, that is the .cpp file they are located.
+
+For example, say I'm working on a small namespace called thing. This is the header file:
+
+// thing.hpp
+
+namespace thing
+{
+    int getX();
+    int getSum();
+}
+#+END_SRC
+
+And this is the implementation file:
+
+// thing.cpp
+
+#+BEGIN_SRC c++
+namespace thing
+{
+    namespace   // anonymous namespace
+    {
+        int x = 1;
+        int y = 2;
+
+        int sum(int a, int b)
+        {
+            return a + b;
+        }
+    }
+
+    int getX()
+    {
+        return x;
+    }
+
+    int getSum()
+    {
+        return sum(x, y);
+    }
+};
+#+END_SRC
+
+
+Notice how I've wrapped the private members in the anonymous namespace. Now only thing can access x, y and sum(). If you try to touch those variables from the outside, an error occurs. Let's try:
+
+#+BEGIN_SRC c++
+#include <cstdio>
+int main(int argc, char **argv)
+{
+    printf("%d\n", thing::getX());     // OK
+    printf("%d\n", thing::getSum());   // OK
+    printf("%d\n", thing::sum(1, 2));  // error: ‘sum‘ is not a member of ‘thing’
+    printf("%d\n", thing::y);          // error: ‘y‘ is not a member of ‘thing’
+}
+#include "thing.hpp"
+#+END_SRC
+Sources
+
+** Stackoverflow - Why are unnamed namespaces used and what are their benefits?
+[[https://stackoverflow.com/questions/357404/why-are-unnamed-namespaces-used-and-what-are-their-benefits][the reason]]

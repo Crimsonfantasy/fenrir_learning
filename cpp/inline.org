@@ -1,0 +1,27 @@
+#+TITLE: Inline
+* inline 的情況
+Think of inline as only a hint to the compiler, a bit like register was in old versions of C++ and C standards. Caveat, register is being obsoleted (in C++17).
+Which of these functions have a chance to become inlined, is it benefitial
+Trust your compiler on making sane inlining decisions. To enable some particular occurrence of a call, the compiler needs to know the body of the called function. You should not care if the compiler is inlining or not (in theory).
+In practice, with the GCC compiler:
+inlining is not always improving the performance (e.g. because of =CPU cache issues, TLB, branch predictor=, etc etc....)
+inlining decisions depends a lot on optimization options. It probably is more likely to happen with =-O3= than with =-O1=; there are many guru options
+(like -finline-limit= and others) to tune it.
+
+notice that individual calls get inlined or not. It is quite possible that some call occurrence like foo(x) at line 123 is inlined, but another call occurrence (to the same function foo) like foo(y) at some other place like line 456 is not inlined.
+
+when debugging, you may want to disable inlining (because that makes the debugging more convenient). This is possible with the =-fno-inline= GCC optimization flag (which I often use with -g, which asks for debugging information).
+
+the always_inline  function attribute "forces" inlining, and the noinline prevents it.
+
+if you compile and link with link time optimization (LTO) such as -flto -O2 (or -flto -O3), e.g. with CXX=g++ -flto -O2 in your Makefile, inlining can happen between several translation units (e.g. C++ source files). However LTO is at least doubling the compilation time (and often, worse) and consumes memory during compilation (so better have a lot of RAM then), and often improve performance by only a few percents (with weird exceptions to this rule of thumb).
+
+you might optimize a function differently, e.g. with #pragma GCC optimize ("-O3") or with function attribute optimize
+
+Look also into profile-guided optimizations with instrumentation options like =-fprofile-generate=  and latter optimizations with =-fprofile-use= with other optimization flags.
+
+If you are curious about what calls are inlined (and sometimes, some won't be) look into the generated assembler (e.g. use =g++ -O2 -S -fverbose-asm= and look in the .s assembler file), or use some internal dump options.
+
+The observable behavior of your code (except performance) should not depend upon inlining decisions made by your compiler. In other words, don't expect inlining to happen (or not). If your code behave differently with or without some optimization it is likely to be buggy. So read about undefined behavior.
+
+See also MILEPOST GCC project (using machine learning techniques for optimization purposes).

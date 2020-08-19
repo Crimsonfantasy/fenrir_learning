@@ -12,4 +12,7 @@
 ps -ef | grep 8web | tr -s " " |  cut -d " "  -f 2 | xargs  kill $1
 #+END_SRC
 
-
+* only show pid of specific name:
+#+BEGIN_SRC shell
+ps -C  main_daemon -o pid=
+#+END_SRC
