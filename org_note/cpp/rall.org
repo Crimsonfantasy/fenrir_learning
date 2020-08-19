@@ -1,0 +1,89 @@
+* RAII
+
+#+BEGIN_SRC c++
+struct Lock
+{
+  Lock(...) { ThreadLock(...); }
+ ~Lock() { ThreadUnlock(...); }
+  ...
+};
+#+END_SRC
+
+
+#+BEGIN_SRC c++
+void f2() // RAII 版本
+{
+  ...
+  {
+    Lock lock(...);
+    ...
+  } // OK, 不管是否發生異常，lock 物件一旦至此就會被解構。
+  ...
+}
+#+END_SRC
+
+* RAID
+#+BEGIN_SRC c++
+#include <functional>
+
+class ScopeGuard {
+private:
+    typedef std::function<void()> destructor_type;
+
+    destructor_type destructor_;
+    bool dismissed_;
+
+public:
+    ScopeGuard(destructor_type destructor) : destructor_(destructor), dismissed_(false) {}
+
+    ~ScopeGuard()
+    {
+        if (!dismissed_) {
+            destructor_();
+        }
+    }
+
+    void dismiss() { dismissed_ = true; }
+
+    ScopeGuard(ScopeGuard const&) = delete;
+    ScopeGuard& operator=(ScopeGuard const&) = delete;
+};
+#+END_SRC
+
+ScopeGuard通常用於省去一些不必要的RAII封裝，例如
+
+#+BEGIN_SRC c++
+void foo()
+{
+    auto fp = fopen("/path/to/file", "w");
+    ScopeGuard fp_guard([&fp]() { fclose(fp); });
+
+    write_to_file(fp);                     // 异常安全
+}
+#+END_SRC
+
+在D語言中，scope關鍵字也是典型的RRID用法，例如
+
+#+BEGIN_SRC c++
+void access_critical_section()
+{
+    Mutex m = new Mutex;
+    lock(m);
+    scope(exit) unlock(m);
+
+    unsafe_code();                  // 异常安全
+}
+
+Resource create()
+{
+    Resource r = new Resource();
+    scope(failure) close(f);
+
+    preprocess(r);                  // 抛出异常时会自动调用close(r)
+    return r;
+}
+
+#+END_SRC
+
+* ref
+[[https://zh.wikipedia.org/wiki/RAII][wiki description]]

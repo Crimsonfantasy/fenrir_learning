@@ -1,0 +1,15 @@
+#+TITLE: Debug
+* GDB
+** Debug multi thread APP :gdb_multi_thread:
+Q: 因為gdb debug multi thread時, 一開始會沒有互動視窗, 你必須這樣做：
+ 1. `C-c C-c`, 停止應用程式
+ 2. 找thread id
+    #+BEGIN_SRC shell
+       info thread
+    #+END_SRC
+ 3. 選擇thread
+    #+BEGIN_SRC shell
+     thread ${tid}
+    #+END_SRC
+ 4. 插入中斷點
+ 5. pass `c` to continues
