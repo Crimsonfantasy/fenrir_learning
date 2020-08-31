@@ -1,0 +1,6 @@
+#+TITLE: Flyspell
+* flyspell not work? :flyspell:
+1. solved  at 2020/08/28:
+  #+BEGIN_SRC shell
+  brew install aspell
+  #+END_SRC

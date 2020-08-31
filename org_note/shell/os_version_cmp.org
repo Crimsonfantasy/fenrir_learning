@@ -1,0 +1,17 @@
+#+TITLE: Os Version Cmp
+* compare os version :shell:os_version:
+#+BEGIN_SRC shell
+# Load the driver when  os version  under 10.16. otherwise unload this driver
+mac_os_version=$(sw_vers | grep ProductVersion | awk '{split($0,a); print a[2]}')
+driverKit_version=10.16
+driver_install="/Library/Extensions/trackballworks2.kext"
+echo "$mac_os_version"
+if [ "$(printf '%s\n' "$mac_os_version" "$driverKit_version" | sort -V | head -n1)" = "$driverKit_version" ]; then
+    echo "greater or equal than ${driverKit_version}"
+    #unloaded
+    kextunload -q  "$driver_install"
+else
+  echo "less than ${driverKit_version}"
+  kextload -q "$driver_install"
+fi
+#+END_SRC

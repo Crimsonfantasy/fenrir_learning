@@ -1,0 +1,14 @@
+#+TITLE: Driver
+* clear system extension drivers
+systemextensionsctl reset
+* list system extension drivers
+systemextensionsctl list
+* check kernel extension drivers
+kextstat | grep -i kensington
+* remove kernel extension driver
+sudo kextunload -b com.kensington.trackballworks2
+sudo rm -R /Library/Extension/trackballworks2.kext
+* real time log
+log stream --predicate 'sender == "sysextd" or sender CONTAINS "tbw"' --info --debug
+* unload Helper
+sudo rm -R /Applications/KensingtonWorks\ .app/Contents/Helper/KensingtonWorksHelper.app/

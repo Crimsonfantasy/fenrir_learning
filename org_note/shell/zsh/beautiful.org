@@ -1,0 +1,9 @@
+*  beautiful Zsh theme
+https://github.com/ohmyzsh/ohmyzsh
+**  issue
+***  command not found
+1. edit ~/.zsh
+2. add script
+   #+BEGIN_SRC shell
+source ~/.bash_profile;pp
+   #+END_SRC
